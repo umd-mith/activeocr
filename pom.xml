@@ -17,6 +17,14 @@
     </repository>
   </repositories>
 
+  <build>
+    <resources>
+      <resource>
+        <directory>data</directory>
+      </resource>
+    </resources>
+  </build>
+
   <parent>
     <groupId>edu.umd.mith</groupId>
     <artifactId>proto</artifactId>
