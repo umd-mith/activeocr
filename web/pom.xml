@@ -5,27 +5,14 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>edu.umd.mith.activeocr</groupId>
-  <artifactId>activeocr</artifactId>
-  <name>Active OCR</name>
+  <artifactId>web</artifactId>
+  <name>Active OCR Web Application</name>
   <version>0.0.1-SNAPSHOT</version>
-  <packaging>pom</packaging>
-
-  <repositories>
-    <repository>
-      <id>mith-snapshots</id>
-      <url>http://umd-mith.github.com/maven-repository/snapshots</url>
-    </repository>
-  </repositories>
 
   <parent>
-    <groupId>edu.umd.mith</groupId>
-    <artifactId>proto</artifactId>
+    <groupId>edu.umd.mith.activeocr</groupId>
+    <artifactId>activeocr</artifactId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
-
-  <modules>
-    <module>util</module>
-    <module>web</module>
-  </modules>
 </project>
 
