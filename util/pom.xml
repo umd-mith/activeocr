@@ -14,5 +14,13 @@
     <artifactId>activeocr</artifactId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
+
+  <build>
+    <resources>
+      <resource>
+        <directory>../data/</directory>
+      </resource>
+    </resources>
+  </build>
 </project>
 
