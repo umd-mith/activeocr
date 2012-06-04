@@ -1,0 +1,42 @@
+<!--
+  #%L
+  Active OCR Web Application
+  %%
+  Copyright (C) 2011 - 2012 Maryland Institute for Technology in the Humanities
+  %%
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+  
+       http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  #L%
+  -->
+<div>
+  <wizard:screen_info><div>Page <wizard:screen_number/> of <wizard:total_screens/></div></wizard:screen_info>
+  <wizard:wizard_top> <div> <wizard:bind/> </div> </wizard:wizard_top>
+  <wizard:screen_top> <div> <wizard:bind/> </div> </wizard:screen_top>
+  <wizard:errors> <div> <ul> <wizard:item> <li> <wizard:bind/> </li> </wizard:item> </ul> </div> </wizard:errors>
+  <div> <wizard:fields>
+      <table>
+        <wizard:line>
+          <tr>
+            <td>
+              <wizard:label><label wizard:for=""><wizard:bind/></label></wizard:label>
+	      <wizard:help><span><wizard:bind/></span></wizard:help>
+	      <wizard:field_errors> <ul> <wizard:error> <li> <wizard:bind/> </li> </wizard:error> </ul> </wizard:field_errors>
+          </td>
+          <td> <wizard:form/> </td>
+          </tr>
+        </wizard:line>
+      </table>
+    </wizard:fields> </div>
+  <div> <table> <tr> <td> <wizard:prev/> </td> <td> <wizard:cancel/> </td> <td> <wizard:next/> </td> </tr> </table> </div>
+  <wizard:screen_bottom> <div> <wizard:bind/> </div> </wizard:screen_bottom>
+  <wizard:wizard_bottom> <div> <wizard:bind/> </div> </wizard:wizard_bottom>
+</div>
