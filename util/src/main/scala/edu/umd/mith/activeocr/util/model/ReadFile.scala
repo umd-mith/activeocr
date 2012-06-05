@@ -23,14 +23,18 @@ import scala.io._
 
 /**
   * @author Paul Evans <decretist@gmail.com>
-  * @date 4 June 2012
   *
   */
 
 object ReadFile {
   def main(args: Array[String]) {
-    /* val s = Source.fromFile("./PL75.txt") */
-    val s = Source.fromFile("/Users/pevans/Work/MITH/activeocr/data/monumentagermani00geseuoft_djvu.txt")
+    /*
+     * Correct way to read resources. Depends on data directory having been 
+     * added to util/pom.xml.
+     */
+    val s = Source.fromInputStream(
+      getClass.getResourceAsStream("/monumentagermani00geseuoft_djvu.txt")
+    )
     s.getLines.foreach( (line) => {
       println(line)
     })
