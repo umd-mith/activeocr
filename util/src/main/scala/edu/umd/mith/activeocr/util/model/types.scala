@@ -38,8 +38,8 @@ trait Container[A <: Bbox, B <: Container[A, B]] extends Bbox {
   // that all children are properly contained.
   lazy val x = this.children.map(_.x).min
   lazy val y = this.children.map(_.y).min
-  lazy val w = this.children.map(_.x).max - this.x
-  lazy val h = this.children.map(_.y).max - this.y
+  lazy val w = this.children.map(_.rx).max - this.x
+  lazy val h = this.children.map(_.ly).max - this.y
 
   def addChild(child: A): B
   def replaceLast(f: A => A): B
