@@ -61,10 +61,17 @@ case class Line(children: IndexedSeq[Word]) extends Container[Word, Line] {
     this.copy(children = this.children.init :+ f(this.children.last))
 }
 
-case class Page(children: IndexedSeq[Line]) extends Container[Line, Page] {
+case class Zone(children: IndexedSeq[Line]) extends Container[Line, Zone] {
   def addChild(child: Line) = this.copy(children = this.children :+ child)
 
   def replaceLast(f: Line => Line) = 
+    this.copy(children = this.children.init :+ f(this.children.last))
+}
+
+case class Page(children: IndexedSeq[Zone]) extends Container[Zone, Page] {
+  def addChild(child: Zone) = this.copy(children = this.children :+ child)
+
+  def replaceLast(f: Zone => Zone) = 
     this.copy(children = this.children.init :+ f(this.children.last))
 }
 
