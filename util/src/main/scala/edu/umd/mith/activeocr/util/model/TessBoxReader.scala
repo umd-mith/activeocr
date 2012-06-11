@@ -24,7 +24,7 @@ import java.io.InputStream
 import scala.io.Source
 
 class TessBoxReader(in: InputStream, w: Int, h: Int)
-  extends FormatReader[Line, Zone] {
+  extends FormatReader[Zone, Page] {
   // Default word space threshhold in pixels (a temporary hack).
   def lineThreshhold = 20
   def spaceThreshhold = 30
@@ -55,7 +55,7 @@ class TessBoxReader(in: InputStream, w: Int, h: Int)
     }
 
     source.close()
-    zone
+    Page(IndexedSeq(zone))
   } 
 }
 
@@ -65,8 +65,8 @@ object TessBoxReader extends App {
   )
 
   val reader = new TessBoxReader(new FileInputStream(args(0)), image.getWidth, image.getHeight)
-  reader.foreach { line =>
-    println(line.children.map(_.children.map(_.c).mkString).mkString(" "))
+  reader.foreach { zone =>
+    println(zone.children.map(_.children.map(_.children.map(_.c).mkString).mkString(" ")))
   }
 }
 
