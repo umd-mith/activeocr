@@ -24,7 +24,7 @@ import java.io.InputStream
 import scala.io.Source
 
 class TessBoxReader(in: InputStream, w: Int, h: Int)
-  extends FormatReader[Line, Page] {
+  extends FormatReader[Line, Zone] {
   // Default word space threshhold in pixels (a temporary hack).
   def lineThreshhold = 20
   def spaceThreshhold = 30
@@ -34,8 +34,8 @@ class TessBoxReader(in: InputStream, w: Int, h: Int)
   lazy val container = {
     val source = Source.fromInputStream(this.in)
 
-    val page = source.getLines.foldLeft(Page(IndexedSeq.empty)) {
-      case (page, LinePattern(c, x1, y1, x2, y2)) =>
+    val zone = source.getLines.foldLeft(Zone(IndexedSeq.empty)) {
+      case (zone, LinePattern(c, x1, y1, x2, y2)) =>
         val glyph = Glyph(
           c, x1.toInt,
           this.h - y2.toInt,
@@ -43,10 +43,10 @@ class TessBoxReader(in: InputStream, w: Int, h: Int)
           y2.toInt - y1.toInt
         )
 
-        if (page.children.isEmpty || glyph.y - page.children.last.ly > this.lineThreshhold)
-          page.addChild(Line(IndexedSeq(Word(IndexedSeq(glyph)))))
+        if (zone.children.isEmpty || glyph.y - zone.children.last.ly > this.lineThreshhold)
+          zone.addChild(Line(IndexedSeq(Word(IndexedSeq(glyph)))))
         else
-          page.replaceLast { line =>
+          zone.replaceLast { line =>
             if (glyph.x - line.children.last.rx > this.spaceThreshhold)
               line.addChild(Word(IndexedSeq(glyph)))
             else
@@ -55,7 +55,7 @@ class TessBoxReader(in: InputStream, w: Int, h: Int)
     }
 
     source.close()
-    page
+    zone
   } 
 }
 
