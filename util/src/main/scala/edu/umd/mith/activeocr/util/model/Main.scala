@@ -19,11 +19,6 @@
  */
 package edu.umd.mith.activeocr.util.model
 
-/**
-  * @author Paul Evans
-  *
-  */
-
 // Simple class to experiment with elements of the model.
 
 object Main {
@@ -32,12 +27,25 @@ object Main {
     val b = new Glyph("b", 20, 10, 10, 10)
     val c = new Glyph("c", 30, 10, 10, 10)
     val d = new Glyph("d", 40, 10, 10, 10)
-    
     val children = IndexedSeq(a, b, c, d)
+    val word1 = new Word(children)
+    println(word1)
+    println(word1.x, word1.y, word1.w, word1.h, word1.rx, word1.ly)
 
-    val word = new Word(children)
+    val e = new Glyph("e", 10, 30, 40, 10)
+    val f = new Glyph("f", 10, 30, 40, 10)
+    val g = new Glyph("g", 10, 30, 40, 10)
+    val h = new Glyph("h", 10, 30, 40, 10)
+    val word2 = new Word(IndexedSeq(e, f, g, h))
+    println(word2)
+    println(word2.x, word2.y, word2.w, word2.h, word2.rx, word2.ly)
 
-    println(word)
-    println(word.x, word.y, word.w, word.h, word.rx, word.ly)
+    val glyphs: IndexedSeq[Glyph] = "Testudo".map(
+      c => Glyph(c.toString, -1, -1, -1, -1)
+    )
+    println(glyphs)
+    val word3 = new Word(glyphs)
+    println(word3)
+    println(word3.x, word3.y, word3.w, word3.h, word3.rx, word3.ly)
   }
 }
