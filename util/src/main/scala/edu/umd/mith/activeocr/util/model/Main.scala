@@ -32,12 +32,20 @@ object Main {
     println(word1)
     println(word1.x, word1.y, word1.w, word1.h, word1.rx, word1.ly)
 
+    val e = new Glyph("e", 10, 30, 40, 10)
+    val f = new Glyph("f", 10, 30, 40, 10)
+    val g = new Glyph("g", 10, 30, 40, 10)
+    val h = new Glyph("h", 10, 30, 40, 10)
+    val word2 = new Word(IndexedSeq(e, f, g, h))
+    println(word2)
+    println(word2.x, word2.y, word2.w, word2.h, word2.rx, word2.ly)
+
     val glyphs: IndexedSeq[Glyph] = "Testudo".map(
       c => Glyph(c.toString, -1, -1, -1, -1)
     )
     println(glyphs)
-    val word2 = new Word(glyphs)
-    println(word2)
-    println(word2.x, word2.y, word2.w, word2.h, word2.rx, word2.ly)
+    val word3 = new Word(glyphs)
+    println(word3)
+    println(word3.x, word3.y, word3.w, word3.h, word3.rx, word3.ly)
   }
 }
