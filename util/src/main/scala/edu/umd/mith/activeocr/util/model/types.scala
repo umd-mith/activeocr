@@ -73,6 +73,39 @@ case class Page(children: IndexedSeq[Zone]) extends Container[Zone, Page] {
 
   def replaceLast(f: Zone => Zone) = 
     this.copy(children = this.children.init :+ f(this.children.last))
+
+  def toSVG(uri: String, imageW: Int, imageH: Int) = {
+    <svg version="1.1"
+      xmlns="http://www.w3.org/2000/svg"
+      xmlns:xlink= "http://www.w3.org/1999/xlink"
+      width={imageW.toString} height={imageH.toString}
+      viewBox={"0 0 %d %d".format(imageW, imageH)}>
+      <image xlink:href={uri}
+        width={imageW.toString} height={imageH.toString}/>
+      {
+        this.children.map { zone =>
+          <rect style="stroke: red; stroke-width: 4; fill: none;"
+            x={zone.x.toString} y={zone.y.toString}
+            width={zone.w.toString} height={zone.h.toString}/> ++
+          zone.children.map { line =>
+            <rect style="stroke: blue; stroke-width: 4; fill: none;"
+              x={line.x.toString} y={line.y.toString}
+              width={line.w.toString} height={line.h.toString}/> ++
+            line.children.map { word =>
+              <rect style="stroke: green; stroke-width: 4; fill: none;"
+                x={word.x.toString} y={word.y.toString}
+                width={word.w.toString} height={word.h.toString}/> ++
+              word.children.map { glyph =>
+                <rect style="stroke: orange; stroke-width: 4; fill: none;"
+                  x={glyph.x.toString} y={glyph.y.toString}
+                  width={glyph.w.toString} height={glyph.h.toString}/>
+              }
+            }
+          }
+        }
+      }
+    </svg>
+  }
 }
 
 trait FormatReader[A <: Bbox, B <: Container[A, B]] extends Iterable[A] {
