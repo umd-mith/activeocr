@@ -64,9 +64,16 @@ object TessBoxReader extends App {
     new java.io.File(args(1))
   )
 
+  val formatter = new scala.xml.PrettyPrinter(80, 2)
+  val printer = new java.io.PrintWriter(args(2))
+
   val reader = new TessBoxReader(new FileInputStream(args(0)), image.getWidth, image.getHeight)
-  reader.foreach { zone =>
-    println(zone.children.map(_.children.map(_.children.map(_.c).mkString).mkString(" ")))
-  }
+
+  printer.println(formatter.format(reader.container.toSVG(args(1), image.getWidth, image.getHeight)))
+  printer.close()
+
+  //reader.foreach { zone =>
+  //  println(zone.children.map(_.children.map(_.children.map(_.c).mkString).mkString(" ")))
+  //}
 }
 
