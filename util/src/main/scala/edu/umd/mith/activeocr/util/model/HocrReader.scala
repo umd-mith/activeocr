@@ -20,6 +20,7 @@
 package edu.umd.mith.activeocr.util.model
 
 import scala.io._
+import scala.util.control.Breaks._
 import scala.xml.pull._
 
 object HocrReader {
@@ -32,11 +33,11 @@ object HocrReader {
       val event = reader.next
       event match {
         case EvElemStart(_, label, attrs, _) => {
-          if (label == "div" || label == "span") {
+          if (label == "div") {
             val (ocrTitle, ocrId, ocrClass) = unpackAttributes(attrs.toString)
-            if (ocrClass != "ocrx_word") {
-              val (x, y, w, h) = unpackDimensions(ocrTitle)
-              println("x = " + x + ", y = " + y + ", w = " + w + ", h = " + h)
+            if (ocrClass == "ocr_page") {
+               val page = makeNewPage(reader, attrs.toString)
+               println(page)
             }
           }
         }
@@ -47,11 +48,150 @@ object HocrReader {
     source.close
   }
 
+  def makeNewPage(reader: XMLEventReader, attributes: String): Page = {
+    val (_, id, _) = unpackAttributes(attributes)
+    println("Creating " + id)
+    var page = new Page(IndexedSeq[Zone]()) // create empty page
+    breakable {
+      while (reader.hasNext) {
+        val event = reader.next
+        event match {
+          case EvElemStart(_, label, attrs, _) => {
+            if (label == "div") {
+              val (ocrTitle, ocrId, ocrClass) = unpackAttributes(attrs.toString)
+              if (ocrClass == "ocr_carea") {
+                page = page.addChild(makeNewZone(reader, attrs.toString))
+              }
+            }
+          }
+          case EvElemEnd(_, label) => { 
+            break
+          }
+          case EvText(text) => { }
+        }
+      }
+    }
+    println("Returning " + id)
+    page
+  }
+
+  def makeNewZone(reader: XMLEventReader, attributes: String): Zone = {
+    val (_, id, _) = unpackAttributes(attributes)
+    println("Creating " + id)
+    var zone = new Zone(IndexedSeq[Line]())
+    breakable {
+      while (reader.hasNext) {
+        val event = reader.next
+        event match {
+          case EvElemStart(_, label, attrs, _) => {
+            if (label == "span") {
+              val (ocrTitle, ocrId, ocrClass) = unpackAttributes(attrs.toString)
+              if (ocrClass == "ocr_line") {
+                zone = zone.addChild(makeNewLine(reader, attrs.toString))
+              }
+            }
+          }
+          case EvElemEnd(_, label) => { 
+            break
+          }
+          case EvText(text) => { }
+        }
+      }
+    }
+    println("Returning " + id)
+    zone
+  }
+
+  def makeNewLine(reader: XMLEventReader, attributes: String): Line = {
+    val (_, id, _) = unpackAttributes(attributes)
+    println("Creating " + id)
+    var line = new Line(IndexedSeq[Word]())
+    breakable {
+      while (reader.hasNext) {
+        val event = reader.next
+        event match {
+          case EvElemStart(_, label, attrs, _) => {
+            if (label == "span") {
+              val (ocrTitle, ocrId, ocrClass) = unpackAttributes(attrs.toString)
+              if (ocrClass == "ocr_word") {
+                line = line.addChild(makeNewWord(reader, attrs.toString))
+              }
+            }
+          }
+          case EvElemEnd(_, label) => { 
+            break
+          }
+          case EvText(text) => { }
+        }
+      }
+    }
+    println("Returning " + id)
+    line
+  }
+
+  def makeNewWord(reader: XMLEventReader, attributes: String): Word = {
+    val (_, id, _) = unpackAttributes(attributes)
+    println("Creating " + id)
+    var word = new Word(IndexedSeq[Glyph]())
+    breakable {
+      while (reader.hasNext) {
+        val event = reader.next
+        println(event)
+        event match {
+          case EvElemStart(_, label, attrs, _) => {
+            if (label == "span") {
+              val (ocrTitle, ocrId, ocrClass) = unpackAttributes(attrs.toString)
+              if (ocrClass == "ocrx_word") {
+                processXword(reader, attrs.toString)
+              }
+            }
+          }
+          case EvElemEnd(_, label) => { 
+            break
+          }
+          case EvText(text) => { }
+        }
+      }
+    }
+    println("Returning " + id)
+    word
+  }
+
+  def processXword(reader: XMLEventReader, attributes: String) {
+    val (_, id, _) = unpackAttributes(attributes)
+    println("Processing " + id)
+    breakable {
+      while (reader.hasNext) {
+        val event = reader.next
+        println(event)
+        event match {
+          case EvElemStart(_, label, attrs, _) => { }
+          case EvElemEnd(_, label) => { 
+            break
+          }
+          case EvText(text) => {
+            println(text)
+          }
+        }
+      }
+    }
+    println("Done Processing " + id)
+  }
+
   def unpackAttributes(attrs: String): (String, String, String) = {
     val Re = " title=\"(.+)\" id=\"(\\w+)\" class=\"(\\w+)\"".r
     val Re(attrTitle, attrId, attrClass) = attrs
     (attrTitle, attrId, attrClass)
   }
+
+  /*
+  def unpackAttributes(attrs: Map[String, String])
+      : Option[(String, String, String)] = for {
+    title <- attrs("title")
+    id <- attrs("id")
+    cl <- attrs("class")
+  } yield (title, id, cl)
+   */
 
   def unpackDimensions(title: String): (Int, Int, Int, Int) = {
     val Re = ".*bbox (\\d+) (\\d+) (\\d+) (\\d+)".r
@@ -72,3 +212,13 @@ object HocrReader {
  * div: ocr_carea, ocr_page
  * span: ocr_line, ocr_word, ocrx_word
  */
+
+          /*
+          if (label == "div" || label == "span") {
+            val (ocrTitle, ocrId, ocrClass) = unpackAttributes(attrs.toString)
+            if (ocrClass != "ocrx_word") {
+              val (x, y, w, h) = unpackDimensions(ocrTitle)
+              println("x = " + x + ", y = " + y + ", w = " + w + ", h = " + h)
+            }
+          }
+           */
