@@ -58,5 +58,16 @@ object Main {
     println(doesItWork)
     val word4 = new Word(doesItWork)
     println(word4)
+
+    val foo = new Page(IndexedSeq[Zone]())
+    println(foo)
+    val bar = makeNewEmptyPage
+    println(bar)
+  }
+
+  def makeNewEmptyPage(): Page = {
+    println("New page created")
+    val page = new Page(IndexedSeq[Zone]())
+    page
   }
 }
