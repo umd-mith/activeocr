@@ -78,8 +78,10 @@ case class Page(children: IndexedSeq[Zone]) extends Container[Zone, Page] {
     <svg version="1.1"
       xmlns="http://www.w3.org/2000/svg"
       xmlns:xlink= "http://www.w3.org/1999/xlink"
-      width={imageW.toString} height={imageH.toString} viewBox={"0 0 %d %d".format(imageW, imageH)}>
-      <image xlink:href={uri} width={imageW.toString} height={imageH.toString}/>
+      width={imageW.toString} height={imageH.toString}
+      viewBox={"0 0 %d %d".format(imageW, imageH)}>
+      <image xlink:href={uri}
+        width={imageW.toString} height={imageH.toString}/>
       {
         this.children.map { zone =>
           <rect style="stroke: red; stroke-width: 4; fill: none;"
