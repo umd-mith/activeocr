@@ -32,15 +32,12 @@ object HocrReader {
       val event = reader.next
       event match {
         case EvElemStart(_, label, attrs, _) => {
-          // Labels with no attributes:
-          // body, em, head, html, strong, title
-          if (label == "meta") { }
-          // p: ocr_par
-          if (label == "p") { } 
-          // div: ocr_carea, ocr_page
-          // span: ocr_line, ocr_word, ocrx_word
           if (label == "div" || label == "span") {
-            doStuffWithAttributes(attrs.toString)
+            val (ocrTitle, ocrId, ocrClass) = unpackAttributes(attrs.toString)
+            if (ocrClass != "ocrx_word") {
+              val (x, y, w, h) = unpackDimensions(ocrTitle)
+              println("x = " + x + ", y = " + y + ", w = " + w + ", h = " + h)
+            }
           }
         }
         case EvElemEnd(_, label) => { }
@@ -50,16 +47,28 @@ object HocrReader {
     source.close
   }
 
-  def doStuffWithAttributes(attributes: String) {
+  def unpackAttributes(attrs: String): (String, String, String) = {
     val Re = " title=\"(.+)\" id=\"(\\w+)\" class=\"(\\w+)\"".r
-    val Re(ocrTitle, ocrId, ocrClass) = attributes
-    if (ocrClass != "ocrx_word") {
-      val Re = ".*bbox (\\d+) (\\d+) (\\d+) (\\d+)".r
-      val Re(x0, y0, x1, y1) = ocrTitle
-      val x = x0.toInt; val y = y0.toInt
-      val w = x1.toInt - x0.toInt
-      val h = y1.toInt - y0.toInt
-      println("x = " + x + ", y = " + y + ", w = " + w + ", h = " + h)
-    }
+    val Re(attrTitle, attrId, attrClass) = attrs
+    (attrTitle, attrId, attrClass)
+  }
+
+  def unpackDimensions(title: String): (Int, Int, Int, Int) = {
+    val Re = ".*bbox (\\d+) (\\d+) (\\d+) (\\d+)".r
+    val Re(x0, y0, x1, y1) = title
+    val x = x0.toInt; val y = y0.toInt
+    val w = x1.toInt - x0.toInt
+    val h = y1.toInt - y0.toInt
+    (x, y, w, h)
   }
 }
+
+/*
+ * The body, em, head, html, strong, and title labels do not have
+ * attributes.  The meta label has 3 attributes (content, http-equiv,
+ * and name) that for now I don't care about. The p label has a single
+ * attribute (class="ocr_par") that adds no information.
+ *
+ * div: ocr_carea, ocr_page
+ * span: ocr_line, ocr_word, ocrx_word
+ */
