@@ -91,9 +91,10 @@ object HocrReader {
               }
             }
           }
-          case EvElemEnd(_, label) => { 
+          case EvElemEnd(_, "div") => { 
             break
           }
+          case EvElemEnd(_, _) => {}
           case EvText(text) => { }
         }
       }
@@ -159,18 +160,18 @@ object HocrReader {
 
   def processXword(reader: XMLEventReader, attributes: String) {
     val (_, id, _) = unpackAttributes(attributes)
-    println("Processing " + id)
+    println("Processing in xword " + id)
     breakable {
       while (reader.hasNext) {
         val event = reader.next
-        println(event)
+        println("event in xword " + event)
         event match {
           case EvElemStart(_, label, attrs, _) => { }
           case EvElemEnd(_, label) => { 
             break
           }
           case EvText(text) => {
-            println(text)
+            println("in xword text: " + text)
           }
         }
       }
@@ -200,6 +201,17 @@ object HocrReader {
     val w = x1.toInt - x0.toInt
     val h = y1.toInt - y0.toInt
     (x, y, w, h)
+  }
+
+  // Don't need this after all right now, but it's potentially useful (TB).
+  private def eatElement(reader: XMLEventReader) {
+    var depth = 1
+    while (reader.hasNext && depth > 0) {
+      reader.next match {
+        case _: EvElemStart => depth + 1
+        case _: EvElemEnd => depth - 1
+      }
+    }
   }
 }
 
