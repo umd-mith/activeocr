@@ -19,6 +19,8 @@
  */
 package edu.umd.mith.activeocr.util.model
 
+import scala.collection.mutable.ArrayBuffer
+
 // Simple class to experiment with elements of the model.
 
 object Main {
@@ -47,5 +49,14 @@ object Main {
     val word3 = new Word(glyphs)
     println(word3)
     println(word3.x, word3.y, word3.w, word3.h, word3.rx, word3.ly)
+
+    val doesItWork = ArrayBuffer[Glyph]()
+    doesItWork += a
+    doesItWork += b
+    doesItWork += c
+    doesItWork += d
+    println(doesItWork)
+    val word4 = new Word(doesItWork)
+    println(word4)
   }
 }
