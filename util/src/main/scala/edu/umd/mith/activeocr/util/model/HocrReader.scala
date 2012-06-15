@@ -36,8 +36,16 @@ object HocrReader {
           if (label == "div") {
             val (ocrTitle, ocrId, ocrClass) = unpackAttributes(attrs.toString)
             if (ocrClass == "ocr_page") {
-               val page = makeNewPage(reader, attrs.toString)
-               println(page)
+              val page = makeNewPage(reader, attrs.toString)
+              // println(page)
+              val formatter = new scala.xml.PrettyPrinter(80, 2)
+              val printer = new java.io.PrintWriter(
+                "/Users/pevans/Work/Scala/files/luxmundi.svg"
+              )
+              printer.println(formatter.format(
+                page.toSVG("/luxmundi.jpeg", 680, 1149))
+              )
+              printer.close()
             }
           }
         }
