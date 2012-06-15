@@ -39,9 +39,7 @@ object HocrReader {
               val page = makeNewPage(reader, attrs.toString)
               // println(page)
               val formatter = new scala.xml.PrettyPrinter(80, 2)
-              val printer = new java.io.PrintWriter(
-                "luxmundi.svg"
-              )
+              val printer = new java.io.PrintWriter("luxmundi.svg")
               printer.println(formatter.format(
                 page.toSVG("../data/luxmundi.jpeg", 680, 1149))
               )
@@ -50,7 +48,7 @@ object HocrReader {
           }
         }
         case EvElemEnd(_, label) => { }
-        case EvText(text) => { }
+        case EvText(text) => { assume(text.trim.isEmpty) }
       }
     }
     source.close
@@ -72,10 +70,8 @@ object HocrReader {
               }
             }
           }
-          case EvElemEnd(_, label) => { 
-            break
-          }
-          case EvText(text) => { }
+          case EvElemEnd(_, label) => { break }
+          case EvText(text) => { assume(text.trim.isEmpty) }
         }
       }
     }
@@ -99,11 +95,9 @@ object HocrReader {
               }
             }
           }
-          case EvElemEnd(_, "div") => { 
-            break
-          }
+          case EvElemEnd(_, "div") => { break }
           case EvElemEnd(_, _) => { }
-          case EvText(text) => { }
+          case EvText(text) => { assume(text.trim.isEmpty) }
         }
       }
     }
@@ -127,10 +121,8 @@ object HocrReader {
               }
             }
           }
-          case EvElemEnd(_, label) => { 
-            break
-          }
-          case EvText(text) => { }
+          case EvElemEnd(_, label) => { break }
+          case EvText(text) => { assume(text.trim.isEmpty) }
         }
       }
     }
@@ -155,14 +147,13 @@ object HocrReader {
               }
             }
           }
-          case EvElemEnd(_, label) => { 
-            break
-          }
-          case EvText(text) => { }
+          case EvElemEnd(_, label) => { break }
+          case EvText(text) => { assume(text.trim.isEmpty) }
         }
       }
     }
-    val glyphs: IndexedSeq[Glyph] = tmpWord.map(c => Glyph(c.toString, x, y, w, h)) 
+    val glyphs: IndexedSeq[Glyph] =
+      tmpWord.map(c => Glyph(c.toString, x, y, w, h)) 
     val word = new Word(glyphs)
     println(id + " End")
     word
@@ -233,13 +224,3 @@ object HocrReader {
  * div: ocr_carea, ocr_page
  * span: ocr_line, ocr_word, ocrx_word
  */
-
-          /*
-          if (label == "div" || label == "span") {
-            val (ocrTitle, ocrId, ocrClass) = unpackAttributes(attrs.toString)
-            if (ocrClass != "ocrx_word") {
-              val (x, y, w, h) = unpackDimensions(ocrTitle)
-              println("x = " + x + ", y = " + y + ", w = " + w + ", h = " + h)
-            }
-          }
-           */
