@@ -162,7 +162,7 @@ object HocrReader {
         }
       }
     }
-    val glyphs: IndexedSeq[Glyph] = tmpWord.map(c => Glyph(c.toString, x, y, h, w)) 
+    val glyphs: IndexedSeq[Glyph] = tmpWord.map(c => Glyph(c.toString, x, y, w, h)) 
     val word = new Word(glyphs)
     println(id + " End")
     word
