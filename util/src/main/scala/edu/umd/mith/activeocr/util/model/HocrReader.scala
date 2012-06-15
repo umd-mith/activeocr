@@ -87,17 +87,24 @@ object HocrReader {
       while (reader.hasNext) {
         val event = reader.next
         event match {
-          case EvElemStart(_, label, attrs, _) => {
-            if (label == "span") {
-              val (ocrTitle, ocrId, ocrClass) = unpackAttributes(attrs.toString)
-              if (ocrClass == "ocr_line") {
-                zone = zone.addChild(makeNewLine(reader, attrs.toString))
-              }
+          case EvElemStart(_, "p", attrs, _) => { 
+            println("<p> Start")
+          }
+          case EvElemEnd(_, "p") => {
+            println("<p> End")
+          }
+          case EvElemStart(_, "span" , attrs, _) => {
+            val (_, _, clss) = unpackAttributes(attrs.toString)
+            if (clss == "ocr_line") {
+              zone = zone.addChild(makeNewLine(reader, attrs.toString))
             }
           }
-          case EvElemEnd(_, "div") => { break }
-          case EvElemEnd(_, _) => { }
-          case EvText(text) => { assume(text.trim.isEmpty) }
+          case EvElemEnd(_, "div") => {
+            break
+          }
+          case EvText(text) => {
+            assume(text.trim.isEmpty)
+          }
         }
       }
     }
