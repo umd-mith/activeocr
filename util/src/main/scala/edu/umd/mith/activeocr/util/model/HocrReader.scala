@@ -40,10 +40,10 @@ object HocrReader {
               // println(page)
               val formatter = new scala.xml.PrettyPrinter(80, 2)
               val printer = new java.io.PrintWriter(
-                "/Users/pevans/Work/Scala/files/luxmundi.svg"
+                "luxmundi.svg"
               )
               printer.println(formatter.format(
-                page.toSVG("/luxmundi.jpeg", 680, 1149))
+                page.toSVG("../data/luxmundi.jpeg", 680, 1149))
               )
               printer.close()
             }
@@ -176,13 +176,11 @@ object HocrReader {
       while (reader.hasNext) {
         val event = reader.next
         event match {
-          case EvElemStart(_, label, attrs, _) => { }
-          case EvElemEnd(_, label) => { 
-            break
-          }
+          case EvElemEnd(_, "span") => break
           case EvText(text) => {
             tmp = text
           }
+          case _ => ()
         }
       }
     }
