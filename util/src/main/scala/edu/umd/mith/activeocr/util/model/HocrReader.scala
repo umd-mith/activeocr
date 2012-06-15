@@ -150,7 +150,8 @@ object HocrReader {
             if (label == "span") {
               val (ocrTitle, ocrId, ocrClass) = unpackAttributes(attrs.toString)
               if (ocrClass == "ocrx_word") {
-                tmpWord = eatWord(reader) //, attrs.toString)
+                tmpWord = eatXword(reader, attrs.toString)
+                // tmpWord = eatWord(reader)
                 println(tmpWord)
               }
             }
@@ -183,6 +184,10 @@ object HocrReader {
       while (reader.hasNext) {
         val event = reader.next
         event match {
+          case EvElemStart(_, "em", _, _) => { println("<em> Start") }
+          case EvElemEnd(_, "em") => { println("<em> End") }
+          case EvElemStart(_, "strong", _, _) => { println("<strong> Start") }
+          case EvElemEnd(_, "strong") => { println("<strong> End") }
           case EvElemEnd(_, "span") => break
           case EvText(text) => {
             tmp = text
