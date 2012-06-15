@@ -150,7 +150,8 @@ object HocrReader {
             if (label == "span") {
               val (ocrTitle, ocrId, ocrClass) = unpackAttributes(attrs.toString)
               if (ocrClass == "ocrx_word") {
-                tmpWord = eatXword(reader, attrs.toString)
+                tmpWord = eatWord(reader) //, attrs.toString)
+                println(tmpWord)
               }
             }
           }
@@ -165,6 +166,14 @@ object HocrReader {
     println(id + " End")
     word
   }
+
+  def eatWord(reader: XMLEventReader) = reader.takeWhile {
+    case EvElemEnd(_, "span") => false
+    case _ => true
+  }.flatMap {
+    case EvText(text) => Some(text)
+    case _ => None
+  }.mkString
 
   def eatXword(reader: XMLEventReader, attributes: String): String = {
     val (_, id, _) = unpackAttributes(attributes)
