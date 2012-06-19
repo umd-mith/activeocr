@@ -34,9 +34,9 @@ object HocrReader {
       event match {
         case EvElemStart(_, label, attrs, _) => {
           if (label == "div") {
-            val (ocrTitle, ocrId, ocrClass) = unpackAttributes(attrs.toString)
+            val (ocrTitle, ocrId, ocrClass) = unpackAttributes(attrs.asAttrMap)
             if (ocrClass == "ocr_page") {
-              val page = makeNewPage(reader, attrs.toString)
+              val page = makeNewPage(reader, attrs)
               // println(page)
               val formatter = new scala.xml.PrettyPrinter(80, 2)
               val printer = new java.io.PrintWriter("luxmundi.svg")
@@ -54,8 +54,8 @@ object HocrReader {
     source.close
   }
 
-  def makeNewPage(reader: XMLEventReader, attributes: String): Page = {
-    val (_, id, _) = unpackAttributes(attributes)
+  def makeNewPage(reader: XMLEventReader, attributes: scala.xml.MetaData): Page = {
+    val (_, id, _) = unpackAttributes(attributes.asAttrMap)
     println(id + " Start")
     var page = new Page(IndexedSeq[Zone]())
     breakable {
@@ -64,9 +64,9 @@ object HocrReader {
         event match {
           case EvElemStart(_, label, attrs, _) => {
             if (label == "div") {
-              val (ocrTitle, ocrId, ocrClass) = unpackAttributes(attrs.toString)
+              val (ocrTitle, ocrId, ocrClass) = unpackAttributes(attrs.asAttrMap)
               if (ocrClass == "ocr_carea") {
-                page = page.addChild(makeNewZone(reader, attrs.toString))
+                page = page.addChild(makeNewZone(reader, attrs))
               }
             }
           }
@@ -79,8 +79,8 @@ object HocrReader {
     page
   }
 
-  def makeNewZone(reader: XMLEventReader, attributes: String): Zone = {
-    val (_, id, _) = unpackAttributes(attributes)
+  def makeNewZone(reader: XMLEventReader, attributes: scala.xml.MetaData): Zone = {
+    val (_, id, _) = unpackAttributes(attributes.asAttrMap)
     println(id + " Start")
     var zone = new Zone(IndexedSeq[Line]())
     breakable {
@@ -94,9 +94,9 @@ object HocrReader {
             println("<p> End")
           }
           case EvElemStart(_, "span" , attrs, _) => {
-            val (_, _, clss) = unpackAttributes(attrs.toString)
+            val (_, _, clss) = unpackAttributes(attrs.asAttrMap)
             if (clss == "ocr_line") {
-              zone = zone.addChild(makeNewLine(reader, attrs.toString))
+              zone = zone.addChild(makeNewLine(reader, attrs))
             }
           }
           case EvElemEnd(_, "div") => {
@@ -112,8 +112,8 @@ object HocrReader {
     zone
   }
 
-  def makeNewLine(reader: XMLEventReader, attributes: String): Line = {
-    val (_, id, _) = unpackAttributes(attributes)
+  def makeNewLine(reader: XMLEventReader, attributes: scala.xml.MetaData): Line = {
+    val (_, id, _) = unpackAttributes(attributes.asAttrMap)
     println(id + " Start")
     var line = new Line(IndexedSeq[Word]())
     breakable {
@@ -122,9 +122,9 @@ object HocrReader {
         event match {
           case EvElemStart(_, label, attrs, _) => {
             if (label == "span") {
-              val (ocrTitle, ocrId, ocrClass) = unpackAttributes(attrs.toString)
+              val (ocrTitle, ocrId, ocrClass) = unpackAttributes(attrs.asAttrMap)
               if (ocrClass == "ocr_word") {
-                line = line.addChild(makeNewWord(reader, attrs.toString))
+                line = line.addChild(makeNewWord(reader, attrs))
               }
             }
           }
@@ -137,8 +137,8 @@ object HocrReader {
     line
   }
 
-  def makeNewWord(reader: XMLEventReader, attributes: String): Word = {
-    val (title, id, _) = unpackAttributes(attributes)
+  def makeNewWord(reader: XMLEventReader, attributes: scala.xml.MetaData): Word = {
+    val (title, id, _) = unpackAttributes(attributes.asAttrMap)
     val (x, y, w, h) = unpackDimensions(title)
     var tmpWord = ""
     println(id + " Start")
@@ -148,9 +148,9 @@ object HocrReader {
         event match {
           case EvElemStart(_, label, attrs, _) => {
             if (label == "span") {
-              val (ocrTitle, ocrId, ocrClass) = unpackAttributes(attrs.toString)
+              val (ocrTitle, ocrId, ocrClass) = unpackAttributes(attrs.asAttrMap)
               if (ocrClass == "ocrx_word") {
-                tmpWord = eatXword(reader, attrs.toString)
+                tmpWord = eatXword(reader, attrs)
                 // tmpWord = eatWord(reader)
                 println(tmpWord)
               }
@@ -176,8 +176,8 @@ object HocrReader {
     case _ => None
   }.mkString
 
-  def eatXword(reader: XMLEventReader, attributes: String): String = {
-    val (_, id, _) = unpackAttributes(attributes)
+  def eatXword(reader: XMLEventReader, attributes: scala.xml.MetaData): String = {
+    val (_, id, _) = unpackAttributes(attributes.asAttrMap)
     println(id + " Start")
     var tmp = ""
     breakable {
@@ -200,28 +200,34 @@ object HocrReader {
     tmp
   }
 
+  /*
   def unpackAttributes(attrs: String): (String, String, String) = {
     val Re = " title=\"(.+)\" id=\"(\\w+)\" class=\"(\\w+)\"".r
     val Re(attrTitle, attrId, attrClass) = attrs
     (attrTitle, attrId, attrClass)
   }
+   */
 
-  /*
   def unpackAttributes(attrs: Map[String, String])
-      : Option[(String, String, String)] = for {
+    //  : Option[(String, String, String)] = for {
+      : (Option[String], Option[String], Option[String]) = for {
     title <- attrs("title")
     id <- attrs("id")
     cl <- attrs("class")
   } yield (title, id, cl)
-   */
 
-  def unpackDimensions(title: String): (Int, Int, Int, Int) = {
-    val Re = ".*bbox (\\d+) (\\d+) (\\d+) (\\d+)".r
-    val Re(x0, y0, x1, y1) = title
-    val x = x0.toInt; val y = y0.toInt
-    val w = x1.toInt - x0.toInt
-    val h = y1.toInt - y0.toInt
-    (x, y, w, h)
+  def unpackDimensions(title: Option[String]): (Int, Int, Int, Int) = {
+    if (title == None) {
+      (0, 0, 0, 0)
+    }
+    else {
+      val Re = ".*bbox (\\d+) (\\d+) (\\d+) (\\d+)".r
+      val Re(x0, y0, x1, y1) = title
+      val x = x0.toInt; val y = y0.toInt
+      val w = x1.toInt - x0.toInt
+      val h = y1.toInt - y0.toInt
+      (x, y, w, h)
+    }
   }
 
   // Don't need this after all right now, but it's potentially useful (TB).
