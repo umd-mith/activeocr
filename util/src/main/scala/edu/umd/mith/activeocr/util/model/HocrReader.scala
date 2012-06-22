@@ -21,12 +21,13 @@ package edu.umd.mith.activeocr.util.model
 
 import scala.io._
 import scala.util.control.Breaks._
+import scala.xml.MetaData
 import scala.xml.pull._
 
 object HocrReader {
   def main(args: Array[String]) {
     val source = Source.fromInputStream(
-      getClass.getResourceAsStream("/luxmundi.html")
+      getClass.getResourceAsStream("/luxmundi1.html")
     )
     val reader = new XMLEventReader(source)
     while (reader.hasNext) {
@@ -53,7 +54,7 @@ object HocrReader {
     source.close
   }
 
-  def makeNewPage(reader: XMLEventReader, attributes: scala.xml.MetaData): Page = {
+  def makeNewPage(reader: XMLEventReader, attributes: MetaData): Page = {
     val id = attributes.asAttrMap.get("id").getOrElse("")
     println(id + " Start")
     var page = new Page(IndexedSeq[Zone]())
@@ -61,12 +62,10 @@ object HocrReader {
       while (reader.hasNext) {
         val event = reader.next
         event match {
-          case EvElemStart(_, label, attrs, _) => {
-            if (label == "div") {
-              val clss = attrs.asAttrMap.get("class").getOrElse("")
-              if (clss == "ocr_carea") {
-                page = page.addChild(makeNewZone(reader, attrs))
-              }
+          case EvElemStart(_, "div", attrs, _) => {
+            val clss = attrs.asAttrMap.get("class").getOrElse("")
+            if (clss == "ocr_carea") {
+              page = page.addChild(makeNewZone(reader, attrs))
             }
           }
           case EvElemEnd(_, label) => { break }
@@ -78,7 +77,7 @@ object HocrReader {
     page
   }
 
-  def makeNewZone(reader: XMLEventReader, attributes: scala.xml.MetaData): Zone = {
+  def makeNewZone(reader: XMLEventReader, attributes: MetaData): Zone = {
     val id = attributes.asAttrMap.get("id").getOrElse("")
     println(id + " Start")
     var zone = new Zone(IndexedSeq[Line]())
@@ -111,7 +110,7 @@ object HocrReader {
     zone
   }
 
-  def makeNewLine(reader: XMLEventReader, attributes: scala.xml.MetaData): Line = {
+  def makeNewLine(reader: XMLEventReader, attributes: MetaData): Line = {
     val id = attributes.asAttrMap.get("id").getOrElse("")
     println(id + " Start")
     var line = new Line(IndexedSeq[Word]())
@@ -136,7 +135,7 @@ object HocrReader {
     line
   }
 
-  def makeNewWord(reader: XMLEventReader, attributes: scala.xml.MetaData): Word = {
+  def makeNewWord(reader: XMLEventReader, attributes: MetaData): Word = {
     val title = attributes.asAttrMap.get("title").getOrElse("")
     val id = attributes.asAttrMap.get("id").getOrElse("")
     val (x, y, w, h) = unpackDimensions(title)
@@ -176,7 +175,7 @@ object HocrReader {
     case _ => None
   }.mkString
 
-  def eatXword(reader: XMLEventReader, attributes: scala.xml.MetaData): String = {
+  def eatXword(reader: XMLEventReader, attributes: MetaData): String = {
     val id = attributes.asAttrMap.get("id").getOrElse("")
     println(id + " Start")
     var tmp = ""
