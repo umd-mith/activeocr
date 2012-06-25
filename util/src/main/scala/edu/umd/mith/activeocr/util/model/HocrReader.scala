@@ -35,7 +35,8 @@ object HocrReader {
       event match {
         case EvElemStart(_, label, attrs, _) => {
           if (label == "div") {
-            val clss = attrs.asAttrMap.get("class").getOrElse("")
+            // val clss = attrs.asAttrMap.get("class").getOrElse("")
+            val clss = attrs.asAttrMap.getOrElse("class", "")
             if (clss == "ocr_page") {
               val page = makeNewPage(reader, attrs)
               val formatter = new scala.xml.PrettyPrinter(80, 2)
