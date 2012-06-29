@@ -41,9 +41,11 @@ object HocrReader {
               val page = makeNewPage(reader, attrs)
               val formatter = new scala.xml.PrettyPrinter(80, 2)
               val printer = new java.io.PrintWriter("luxmundi.svg")
+              /*
               printer.println(formatter.format(
                 page.toSVG("../data/luxmundi.jpeg", 680, 1149))
               )
+              */
               printer.close()
             }
           }
@@ -114,7 +116,7 @@ object HocrReader {
   def makeNewLine(reader: XMLEventReader, attributes: MetaData): Line = {
     val id = attributes.asAttrMap.get("id").getOrElse("")
     println(id + " Start")
-    var line = new Line(IndexedSeq[Word]())
+    var line = new ContLine(IndexedSeq[Word]())
     breakable {
       while (reader.hasNext) {
         val event = reader.next
@@ -163,7 +165,7 @@ object HocrReader {
     }
     val glyphs: IndexedSeq[Glyph] =
       tmpWord.map(c => Glyph(c.toString, x, y, w, h)) 
-    val word = new Word(glyphs)
+    val word = new ContWord(glyphs)
     println(id + " End")
     word
   }

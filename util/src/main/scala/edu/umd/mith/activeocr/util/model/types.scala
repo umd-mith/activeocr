@@ -45,16 +45,26 @@ trait Container[A <: Bbox, B <: Container[A, B]] extends Bbox {
   def replaceLast(f: A => A): B
 }
 
+trait Word extends Bbox
+
+trait Line extends Bbox
+
 case class Glyph(c: String, x: Int, y: Int, w: Int, h: Int) extends Bbox
 
-case class Word(children: IndexedSeq[Glyph]) extends Container[Glyph, Word] {
+case class TermWord(s: String, x: Int, y: Int, w: Int, h: Int) extends Word
+
+case class ContWord(children: IndexedSeq[Glyph]) 
+    extends Container[Glyph, ContWord] with Word {
   def addChild(child: Glyph) = this.copy(children = this.children :+ child)
 
   def replaceLast(f: Glyph => Glyph) = 
     this.copy(children = this.children.init :+ f(this.children.last))
 }
 
-case class Line(children: IndexedSeq[Word]) extends Container[Word, Line] {
+case class TermLine(s: String, x: Int, y: Int, w: Int, h: Int) extends Line
+
+case class ContLine(children: IndexedSeq[Word]) 
+    extends Container[Word, ContLine] with Line {
   def addChild(child: Word) = this.copy(children = this.children :+ child)
 
   def replaceLast(f: Word => Word) = 
@@ -74,6 +84,7 @@ case class Page(children: IndexedSeq[Zone]) extends Container[Zone, Page] {
   def replaceLast(f: Zone => Zone) = 
     this.copy(children = this.children.init :+ f(this.children.last))
 
+  /*
   def toSVG(uri: String, imageW: Int, imageH: Int) =
     <svg version="1.1"
       xmlns="http://www.w3.org/2000/svg"
@@ -105,6 +116,7 @@ case class Page(children: IndexedSeq[Zone]) extends Container[Zone, Page] {
         }
       }
     </svg>
+    */
 }
 
 trait FormatReader[A <: Bbox, B <: Container[A, B]] extends Iterable[A] {

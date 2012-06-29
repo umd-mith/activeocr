@@ -24,8 +24,6 @@ import scala.util.control.Breaks._
 import scala.xml.MetaData
 import scala.xml.pull._
 
-case class TermLine (s: String, x: Int, y: Int, w: Int, h: Int) extends Bbox
-
 object OcroReader {
   def main(args: Array[String]) {
     val filename = "/luxmundi2.html"
@@ -88,8 +86,8 @@ object OcroReader {
     page
   }
 
-  def makeNewLine(reader: XMLEventReader, attributes: MetaData): Line = {
-    var line = new Line(IndexedSeq[Word]())
+  def makeNewLine(reader: XMLEventReader, attributes: MetaData): TermLine = {
+    var line = new TermLine("foo", 0, 0, 0, 0)
     breakable {
       while (reader.hasNext) {
         val event = reader.next

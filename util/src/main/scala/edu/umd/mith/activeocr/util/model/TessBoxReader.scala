@@ -44,7 +44,7 @@ class TessBoxReader(in: InputStream, w: Int, h: Int)
         )
 
         if (zone.children.isEmpty || glyph.y - zone.children.last.ly > this.lineThreshhold)
-          zone.addChild(Line(IndexedSeq(Word(IndexedSeq(glyph)))))
+          zone.addChild(ContLine(IndexedSeq(ContWord(IndexedSeq(glyph)))))
         else
           zone.replaceLast { line =>
             if (glyph.x - line.children.last.rx > this.spaceThreshhold)
@@ -69,8 +69,8 @@ object TessBoxReader extends App {
 
   val reader = new TessBoxReader(new FileInputStream(args(0)), image.getWidth, image.getHeight)
 
-  printer.println(formatter.format(reader.container.toSVG(args(1), image.getWidth, image.getHeight)))
-  printer.close()
+  // printer.println(formatter.format(reader.container.toSVG(args(1), image.getWidth, image.getHeight)))
+  // printer.close()
 
   //reader.foreach { zone =>
   //  println(zone.children.map(_.children.map(_.children.map(_.c).mkString).mkString(" ")))
