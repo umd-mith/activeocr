@@ -35,7 +35,6 @@ object HocrReader {
       event match {
         case EvElemStart(_, label, attrs, _) => {
           if (label == "div") {
-            // val clss = attrs.asAttrMap.get("class").getOrElse("")
             val clss = attrs.asAttrMap.getOrElse("class", "")
             if (clss == "ocr_page") {
               val page = makeNewPage(reader, attrs)
@@ -58,7 +57,7 @@ object HocrReader {
   }
 
   def makeNewPage(reader: XMLEventReader, attributes: MetaData): Page = {
-    val id = attributes.asAttrMap.get("id").getOrElse("")
+    val id = attributes.asAttrMap.getOrElse("id", "")
     println(id + " Start")
     var page = new Page(IndexedSeq[Zone]())
     breakable {
@@ -66,7 +65,7 @@ object HocrReader {
         val event = reader.next
         event match {
           case EvElemStart(_, "div", attrs, _) => {
-            val clss = attrs.asAttrMap.get("class").getOrElse("")
+            val clss = attrs.asAttrMap.getOrElse("class", "")
             if (clss == "ocr_carea") {
               page = page.addChild(makeNewZone(reader, attrs))
             }
@@ -81,7 +80,7 @@ object HocrReader {
   }
 
   def makeNewZone(reader: XMLEventReader, attributes: MetaData): Zone = {
-    val id = attributes.asAttrMap.get("id").getOrElse("")
+    val id = attributes.asAttrMap.getOrElse("id", "")
     println(id + " Start")
     var zone = new Zone(IndexedSeq[Line]())
     breakable {
@@ -95,7 +94,7 @@ object HocrReader {
             println("<p> End")
           }
           case EvElemStart(_, "span" , attrs, _) => {
-            val clss = attrs.asAttrMap.get("class").getOrElse("")
+            val clss = attrs.asAttrMap.getOrElse("class", "")
             if (clss == "ocr_line") {
               zone = zone.addChild(makeNewLine(reader, attrs))
             }
@@ -114,7 +113,7 @@ object HocrReader {
   }
 
   def makeNewLine(reader: XMLEventReader, attributes: MetaData): Line = {
-    val id = attributes.asAttrMap.get("id").getOrElse("")
+    val id = attributes.asAttrMap.getOrElse("id", "")
     println(id + " Start")
     var line = new ContLine(IndexedSeq[Word]())
     breakable {
@@ -123,7 +122,7 @@ object HocrReader {
         event match {
           case EvElemStart(_, label, attrs, _) => {
             if (label == "span") {
-              val clss = attrs.asAttrMap.get("class").getOrElse("")
+              val clss = attrs.asAttrMap.getOrElse("class", "")
               if (clss == "ocr_word") {
                 line = line.addChild(makeNewWord(reader, attrs))
               }
@@ -140,7 +139,7 @@ object HocrReader {
 
   def makeNewWord(reader: XMLEventReader, attributes: MetaData): Word = {
     val title = attributes.asAttrMap.get("title").getOrElse("")
-    val id = attributes.asAttrMap.get("id").getOrElse("")
+    val id = attributes.asAttrMap.getOrElse("id", "")
     val (x, y, w, h) = unpackDimensions(title)
     var tmpWord = ""
     println(id + " Start")
@@ -150,7 +149,7 @@ object HocrReader {
         event match {
           case EvElemStart(_, label, attrs, _) => {
             if (label == "span") {
-              val clss = attrs.asAttrMap.get("class").getOrElse("")
+              val clss = attrs.asAttrMap.getOrElse("class", "")
               if (clss == "ocrx_word") {
                 tmpWord = eatXword(reader, attrs)
                 // tmpWord = eatWord(reader)
@@ -179,7 +178,7 @@ object HocrReader {
   }.mkString
 
   def eatXword(reader: XMLEventReader, attributes: MetaData): String = {
-    val id = attributes.asAttrMap.get("id").getOrElse("")
+    val id = attributes.asAttrMap.getOrElse("id", "")
     println(id + " Start")
     var tmp = ""
     breakable {
