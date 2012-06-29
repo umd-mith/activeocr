@@ -38,14 +38,15 @@ object HocrReader {
             val clss = attrs.asAttrMap.getOrElse("class", "")
             if (clss == "ocr_page") {
               val page = makeNewPage(reader, attrs)
+              println(page)
+              /*
               val formatter = new scala.xml.PrettyPrinter(80, 2)
               val printer = new java.io.PrintWriter("luxmundi.svg")
-              /*
               printer.println(formatter.format(
                 page.toSVG("../data/luxmundi.jpeg", 680, 1149))
               )
-              */
               printer.close()
+               */
             }
           }
         }
@@ -138,7 +139,7 @@ object HocrReader {
   }
 
   def makeNewWord(reader: XMLEventReader, attributes: MetaData): Word = {
-    val title = attributes.asAttrMap.get("title").getOrElse("")
+    val title = attributes.asAttrMap.getOrElse("title", "")
     val id = attributes.asAttrMap.getOrElse("id", "")
     val (x, y, w, h) = unpackDimensions(title)
     var tmpWord = ""
@@ -162,9 +163,12 @@ object HocrReader {
         }
       }
     }
+    /*
     val glyphs: IndexedSeq[Glyph] =
       tmpWord.map(c => Glyph(c.toString, x, y, w, h)) 
     val word = new ContWord(glyphs)
+     */
+    val word = new TermWord(tmpWord, x, y, w, h)
     println(id + " End")
     word
   }

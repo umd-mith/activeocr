@@ -35,7 +35,7 @@ object OcroReader {
       val event = reader.next
       event match {
         case EvElemStart(_, "div", attrs, _) => {
-          val clss = attrs.asAttrMap.get("class").getOrElse("")
+          val clss = attrs.asAttrMap.getOrElse("class", "")
           if (clss == "ocr_page") {
             val page = makeNewPageZone(reader, attrs)
             println(page)
@@ -70,7 +70,7 @@ object OcroReader {
         event match {
           case EvElemStart(_, "p", _, _) => { /* ignore */ }
           case EvElemStart(_, "span", attrs, _) => {
-            val clss = attrs.asAttrMap.get("class").getOrElse("")
+            val clss = attrs.asAttrMap.getOrElse("class", "")
             if (clss == "ocr_line") {
               zone = zone.addChild(makeNewLine(reader, attrs))
             }
@@ -87,17 +87,29 @@ object OcroReader {
   }
 
   def makeNewLine(reader: XMLEventReader, attributes: MetaData): TermLine = {
-    var line = new TermLine("foo", 0, 0, 0, 0)
+    val title = attributes.asAttrMap.getOrElse("title", "")
+    val (x, y, w, h) = unpackDimensions(title)
+    var tmpText = ""
     breakable {
       while (reader.hasNext) {
         val event = reader.next
         event match {
           case EvComment(_) => { /* HTML entities */ }
           case EvElemEnd(_, "span") => { break }
-          case EvText(text) => { /* println(text) */ }
+          case EvText(text) => { tmpText = text }
         }
       }
     }
+    val line = new TermLine(tmpText, x, y, w, h)
     line
+  }
+
+  def unpackDimensions(title: String): (Int, Int, Int, Int) = {
+    val Re = ".*bbox (\\d+) (\\d+) (\\d+) (\\d+)".r
+    val Re(x0, y0, x1, y1) = title
+    val x = x0.toInt; val y = y0.toInt
+    val w = x1.toInt - x0.toInt
+    val h = y1.toInt - y0.toInt
+    (x, y, w, h)
   }
 }
