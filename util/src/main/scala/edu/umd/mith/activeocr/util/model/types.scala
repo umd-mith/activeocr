@@ -26,10 +26,11 @@ trait Bbox {
   def y: Int
   def w: Int
   def h: Int
+  def color: String
   def rx = this.x + this.w
   def ly = this.y + this.h
   def toSVG: scala.xml.NodeSeq =
-    <rect style="stroke: blue; stroke-width: 4; fill: none;"
+    <rect style={"stroke: %s; stroke-width: 4; fill: none;".format(color)}
     x={this.x.toString} y={this.y.toString}
     width={this.w.toString} height={this.h.toString}/>
 }
@@ -49,7 +50,7 @@ trait Container[A <: Bbox, B <: Container[A, B]] extends Bbox {
   def replaceLast(f: A => A): B
 
   override def toSVG =
-    <rect style="stroke: red; stroke-width: 4; fill: none;"
+    <rect style={"stroke: %s; stroke-width: 4; fill: none;".format(color)}
     x={this.x.toString} y={this.y.toString}
     width={this.w.toString} height={this.h.toString}/> ++
     {
@@ -59,11 +60,13 @@ trait Container[A <: Bbox, B <: Container[A, B]] extends Bbox {
     }
 }
 
-trait Word extends Bbox
+trait Word extends Bbox { val color = "green" }
 
-trait Line extends Bbox
+trait Line extends Bbox { val color = "blue" }
 
-case class Glyph(c: String, x: Int, y: Int, w: Int, h: Int) extends Bbox
+case class Glyph(c: String, x: Int, y: Int, w: Int, h: Int) extends Bbox {
+  val color = "orange"
+}
 
 case class TermWord(s: String, x: Int, y: Int, w: Int, h: Int) extends Word
 
@@ -86,6 +89,7 @@ case class ContLine(children: IndexedSeq[Word])
 }
 
 case class Zone(children: IndexedSeq[Line]) extends Container[Line, Zone] {
+  val color = "red"
   def addChild(child: Line) = this.copy(children = this.children :+ child)
 
   def replaceLast(f: Line => Line) = 
@@ -93,6 +97,7 @@ case class Zone(children: IndexedSeq[Line]) extends Container[Line, Zone] {
 }
 
 case class Page(children: IndexedSeq[Zone]) extends Container[Zone, Page] {
+  val color = ""
   def addChild(child: Zone) = this.copy(children = this.children :+ child)
 
   def replaceLast(f: Zone => Zone) = 
