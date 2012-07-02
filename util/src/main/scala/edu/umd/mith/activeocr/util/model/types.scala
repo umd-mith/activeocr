@@ -47,7 +47,12 @@ trait Container[A <: Bbox, B <: Container[A, B]] extends Bbox {
 
 trait Word extends Bbox
 
-trait Line extends Bbox
+trait Line extends Bbox {
+  def toSVG =
+    <rect style="stroke: blue; stroke-width: 4; fill: none;"
+    x={this.x.toString} y={this.y.toString}
+    width={this.w.toString} height={this.h.toString}/>
+}
 
 case class Glyph(c: String, x: Int, y: Int, w: Int, h: Int) extends Bbox
 
@@ -76,6 +81,16 @@ case class Zone(children: IndexedSeq[Line]) extends Container[Line, Zone] {
 
   def replaceLast(f: Line => Line) = 
     this.copy(children = this.children.init :+ f(this.children.last))
+
+  def toSVG =
+    <rect style="stroke: red; stroke-width: 4; fill: none;"
+    x={this.x.toString} y={this.y.toString}
+    width={this.w.toString} height={this.h.toString}/> ++
+    {
+      this.children.map {
+        _.toSVG
+      }
+    }
 }
 
 case class Page(children: IndexedSeq[Zone]) extends Container[Zone, Page] {
@@ -84,7 +99,6 @@ case class Page(children: IndexedSeq[Zone]) extends Container[Zone, Page] {
   def replaceLast(f: Zone => Zone) = 
     this.copy(children = this.children.init :+ f(this.children.last))
 
-  /*
   def toSVG(uri: String, imageW: Int, imageH: Int) =
     <svg version="1.1"
       xmlns="http://www.w3.org/2000/svg"
@@ -94,29 +108,11 @@ case class Page(children: IndexedSeq[Zone]) extends Container[Zone, Page] {
       <image xlink:href={uri}
         width={imageW.toString} height={imageH.toString}/>
       {
-        this.children.map { zone =>
-          <rect style="stroke: red; stroke-width: 4; fill: none;"
-            x={zone.x.toString} y={zone.y.toString}
-            width={zone.w.toString} height={zone.h.toString}/> ++
-          zone.children.map { line =>
-            <rect style="stroke: blue; stroke-width: 4; fill: none;"
-              x={line.x.toString} y={line.y.toString}
-              width={line.w.toString} height={line.h.toString}/> ++
-            line.children.map { word =>
-              <rect style="stroke: green; stroke-width: 4; fill: none;"
-                x={word.x.toString} y={word.y.toString}
-                width={word.w.toString} height={word.h.toString}/> ++
-              word.children.map { glyph =>
-                <rect style="stroke: orange; stroke-width: 4; fill: none;"
-                  x={glyph.x.toString} y={glyph.y.toString}
-                  width={glyph.w.toString} height={glyph.h.toString}/>
-              }
-            }
-          }
+        this.children.map {
+          zone => zone.toSVG
         }
       }
     </svg>
-    */
 }
 
 trait FormatReader[A <: Bbox, B <: Container[A, B]] extends Iterable[A] {

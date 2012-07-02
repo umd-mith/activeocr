@@ -38,15 +38,13 @@ object HocrReader {
             val clss = attrs.asAttrMap.getOrElse("class", "")
             if (clss == "ocr_page") {
               val page = makeNewPage(reader, attrs)
-              println(page)
-              /*
+              // println(page)
               val formatter = new scala.xml.PrettyPrinter(80, 2)
               val printer = new java.io.PrintWriter("luxmundi.svg")
               printer.println(formatter.format(
                 page.toSVG("../data/luxmundi.jpeg", 680, 1149))
               )
               printer.close()
-               */
             }
           }
         }
