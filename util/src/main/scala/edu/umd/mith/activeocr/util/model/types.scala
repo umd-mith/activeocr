@@ -50,10 +50,8 @@ trait Container[A <: Bbox, B <: Container[A, B]] extends Bbox {
   def replaceLast(f: A => A): B
 
   override def toSVG =
-    <rect style={"stroke: %s; stroke-width: 4; fill: none;".format(color)}
-    x={this.x.toString} y={this.y.toString}
-    width={this.w.toString} height={this.h.toString}/> ++
     {
+      super.toSVG ++
       this.children.flatMap {
         _.toSVG
       }
