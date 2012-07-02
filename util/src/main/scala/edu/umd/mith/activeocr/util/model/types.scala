@@ -28,6 +28,10 @@ trait Bbox {
   def h: Int
   def rx = this.x + this.w
   def ly = this.y + this.h
+  def toSVG: scala.xml.NodeSeq =
+    <rect style="stroke: blue; stroke-width: 4; fill: none;"
+    x={this.x.toString} y={this.y.toString}
+    width={this.w.toString} height={this.h.toString}/>
 }
 
 trait Container[A <: Bbox, B <: Container[A, B]] extends Bbox {
@@ -43,16 +47,21 @@ trait Container[A <: Bbox, B <: Container[A, B]] extends Bbox {
 
   def addChild(child: A): B
   def replaceLast(f: A => A): B
+
+  override def toSVG =
+    <rect style="stroke: red; stroke-width: 4; fill: none;"
+    x={this.x.toString} y={this.y.toString}
+    width={this.w.toString} height={this.h.toString}/> ++
+    {
+      this.children.flatMap {
+        _.toSVG
+      }
+    }
 }
 
 trait Word extends Bbox
 
-trait Line extends Bbox {
-  def toSVG =
-    <rect style="stroke: blue; stroke-width: 4; fill: none;"
-    x={this.x.toString} y={this.y.toString}
-    width={this.w.toString} height={this.h.toString}/>
-}
+trait Line extends Bbox
 
 case class Glyph(c: String, x: Int, y: Int, w: Int, h: Int) extends Bbox
 
@@ -81,16 +90,6 @@ case class Zone(children: IndexedSeq[Line]) extends Container[Line, Zone] {
 
   def replaceLast(f: Line => Line) = 
     this.copy(children = this.children.init :+ f(this.children.last))
-
-  def toSVG =
-    <rect style="stroke: red; stroke-width: 4; fill: none;"
-    x={this.x.toString} y={this.y.toString}
-    width={this.w.toString} height={this.h.toString}/> ++
-    {
-      this.children.map {
-        _.toSVG
-      }
-    }
 }
 
 case class Page(children: IndexedSeq[Zone]) extends Container[Zone, Page] {
