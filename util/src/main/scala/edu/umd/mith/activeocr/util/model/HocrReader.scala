@@ -32,9 +32,8 @@ object HocrReader {
     )
     val reader = new XMLEventReader(source)
     while (reader.hasNext) {
-      val event = reader.next
-      event match {
-        case EvElemStart(_, label, attrs, _) => {
+      reader.next match {
+        case EvElemStart(_, label, attrs, _) =>
           if (label == "div") {
             val clss = attrs.asAttrMap.getOrElse("class", "")
             if (clss == "ocr_page") {
@@ -47,9 +46,9 @@ object HocrReader {
               printer.close()
             }
           }
-        }
-        case EvElemEnd(_, label) => { }
-        case EvText(text) => { assume(text.trim.isEmpty) }
+
+        case EvElemEnd(_, label) => ()
+        case EvText(text) => assume(text.trim.isEmpty)
       }
     }
     source.close
