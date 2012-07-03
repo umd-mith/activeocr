@@ -94,13 +94,13 @@ case class Zone(children: IndexedSeq[Line]) extends Container[Line, Zone] {
     this.copy(children = this.children.init :+ f(this.children.last))
 }
 
-case class Page(children: IndexedSeq[Zone]) extends Container[Zone, Page] {
+case class Page(children: IndexedSeq[Zone], uri: String, imageW: Int, imageH: Int) extends Container[Zone, Page] {
   def addChild(child: Zone) = this.copy(children = this.children :+ child)
 
   def replaceLast(f: Zone => Zone) = 
     this.copy(children = this.children.init :+ f(this.children.last))
 
-  def toSVG(uri: String, imageW: Int, imageH: Int) =
+  override def toSVG =
     <svg version="1.1"
       xmlns="http://www.w3.org/2000/svg"
       xmlns:xlink= "http://www.w3.org/1999/xlink"

@@ -37,7 +37,7 @@ object OcroReader {
         case EvElemStart(_, "div", attrs, _) => {
           val clss = attrs.asAttrMap.getOrElse("class", "")
           if (clss == "ocr_page") {
-            val page = makeNewPageZone(reader, attrs)
+            val page = makeNewPageZone(reader, attrs, "../data/luxmundi.jpeg", 680, 1149)
             println(page)
           }
         }
@@ -62,7 +62,7 @@ object OcroReader {
     }
   }
 
-  def makeNewPageZone(reader: XMLEventReader, attributes: MetaData): Page = {
+  def makeNewPageZone(reader: XMLEventReader, attributes: MetaData, uri: String, imageW: Int, imageH: Int): Page = {
     var zone = new Zone(IndexedSeq[Line]())
     breakable {
       while (reader.hasNext) {
@@ -81,7 +81,7 @@ object OcroReader {
         }
       }
     }
-    var page = new Page(IndexedSeq[Zone]())
+    var page = new Page(IndexedSeq[Zone](), uri, imageW, imageH)
     page = page.addChild(zone)
     page
   }

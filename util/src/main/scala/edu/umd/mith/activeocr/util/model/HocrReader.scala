@@ -37,13 +37,13 @@ object HocrReader {
           if (label == "div") {
             val clss = attrs.asAttrMap.getOrElse("class", "")
             if (clss == "ocr_page") {
-              val page = makeNewPage(reader, attrs)
+              val page = makeNewPage(
+                reader, attrs, "../data/luxmundi.jpeg", 680, 1149
+              )
               // println(page)
               val formatter = new scala.xml.PrettyPrinter(80, 2)
               val printer = new java.io.PrintWriter("luxmundi.svg")
-              printer.println(formatter.format(
-                page.toSVG("../data/luxmundi.jpeg", 680, 1149))
-              )
+              printer.println(formatter.format(page.toSVG))
               printer.close()
             }
           }
@@ -55,10 +55,10 @@ object HocrReader {
     source.close
   }
 
-  def makeNewPage(reader: XMLEventReader, attributes: MetaData): Page = {
+  def makeNewPage(reader: XMLEventReader, attributes: MetaData, uri: String, imageW: Int, imageH: Int): Page = {
     val id = attributes.asAttrMap.getOrElse("id", "")
     println(id + " Start")
-    var page = new Page(IndexedSeq[Zone]())
+    var page = new Page(IndexedSeq[Zone](), uri, imageW, imageH)
     breakable {
       while (reader.hasNext) {
         val event = reader.next
