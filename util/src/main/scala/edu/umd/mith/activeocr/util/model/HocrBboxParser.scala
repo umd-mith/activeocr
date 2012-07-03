@@ -26,7 +26,6 @@ case class HocrBbox(
   y: Int,
   w: Int,
   h: Int,
-  color: String,
   items: Option[Seq[(Seq[Int], Double)]] = None
 ) extends Bbox {
   def glyphs: Option[Seq[Glyph]] = this.items.map(_.map {
@@ -64,7 +63,7 @@ object HocrBboxParser extends JavaTokenParsers {
     cs => opt(this.sc ~> this.nlps(cs)) ^^ (_.getOrElse(cs.map((_, 0.0))))
   }) ^^ {
     case ((x1, x2), (y1, y2)) ~ items =>
-      HocrBbox(x1, y1, x2 - x1, y2 - y1, "color", items)
+      HocrBbox(x1, y1, x2 - x1, y2 - y1, items)
   }
 
   def apply(s: String) = this.parseAll(this.line, s.trim)
