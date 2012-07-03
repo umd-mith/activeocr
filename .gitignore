@@ -4,4 +4,5 @@ util/target/
 util/tmp/
 web/target/
 web/tmp/
+*.svg
 
