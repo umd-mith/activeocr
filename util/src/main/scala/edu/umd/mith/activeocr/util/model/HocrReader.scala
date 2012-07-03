@@ -26,8 +26,9 @@ import scala.xml.pull._
 
 object HocrReader {
   def main(args: Array[String]) {
+    val filename = "/luxmundi1.html"
     val source = Source.fromInputStream(
-      getClass.getResourceAsStream("/luxmundi1.html")
+      getClass.getResourceAsStream(filename)
     )
     val reader = new XMLEventReader(source)
     while (reader.hasNext) {
@@ -40,9 +41,8 @@ object HocrReader {
               val page = makeNewPage(
                 reader, attrs, "../data/luxmundi.jpeg", 680, 1149
               )
-              // println(page)
               val formatter = new scala.xml.PrettyPrinter(80, 2)
-              val printer = new java.io.PrintWriter("luxmundi.svg")
+              val printer = new java.io.PrintWriter("luxmundi1.svg")
               printer.println(formatter.format(page.toSVG))
               printer.close()
             }

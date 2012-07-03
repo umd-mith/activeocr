@@ -37,8 +37,13 @@ object OcroReader {
         case EvElemStart(_, "div", attrs, _) => {
           val clss = attrs.asAttrMap.getOrElse("class", "")
           if (clss == "ocr_page") {
-            val page = makeNewPageZone(reader, attrs, "../data/luxmundi.jpeg", 680, 1149)
-            println(page)
+            val page = makeNewPageZone(
+              reader, attrs, "../data/luxmundi.jpeg", 680, 1149
+            )
+            val formatter = new scala.xml.PrettyPrinter(80, 2)
+            val printer = new java.io.PrintWriter("luxmundi2.svg")
+            printer.println(formatter.format(page.toSVG))
+            printer.close()
           }
         }
         case EvElemStart(_, "title", _, _) => { eatTitle(reader) }
