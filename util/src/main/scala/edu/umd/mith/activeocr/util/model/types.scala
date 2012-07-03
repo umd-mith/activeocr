@@ -30,8 +30,9 @@ trait Bbox {
   def rx = this.x + this.w
   def ly = this.y + this.h
   def toSVG: scala.xml.NodeSeq =
-    <rect style={"stroke: %s; stroke-width: 4; fill: none;".format(color.getOrElse(""))}
-    x={this.x.toString} y={this.y.toString}
+    <rect style={"%sstroke-width: 4; fill: none;".format(
+      color.map("stroke: %s; ".format(_)).getOrElse("")
+    )} x={this.x.toString} y={this.y.toString}
     width={this.w.toString} height={this.h.toString}/>
 }
 
@@ -49,13 +50,7 @@ trait Container[A <: Bbox, B <: Container[A, B]] extends Bbox {
   def addChild(child: A): B
   def replaceLast(f: A => A): B
 
-  override def toSVG =
-    {
-      super.toSVG ++
-      this.children.flatMap {
-        _.toSVG
-      }
-    }
+  override def toSVG = super.toSVG ++ this.children.flatMap(_.toSVG)
 }
 
 trait Word extends Bbox { override val color = Some("green") }
@@ -108,11 +103,7 @@ case class Page(children: IndexedSeq[Zone], uri: String, imageW: Int, imageH: In
       viewBox={"0 0 %d %d".format(imageW, imageH)}>
       <image xlink:href={uri}
         width={imageW.toString} height={imageH.toString}/>
-      {
-        this.children.map {
-          _.toSVG
-        }
-      }
+      { this.children.map(_.toSVG) }
     </svg>
 }
 
