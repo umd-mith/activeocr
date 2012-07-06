@@ -39,7 +39,7 @@ case class HocrBbox(
         case _ => throw new RuntimeException("Will never happen.")
       }
       
-      (0 :: averaged).zip(averaged :+ this.rx).zip(cs).map {
+      averaged.zip(averaged.tail :+ this.rx).zip(cs).map {
         case ((x1, x2), c) => Glyph(c, x1, y, x2 - x1, h)
       }
     } else None
@@ -72,7 +72,7 @@ object HocrBboxParser extends JavaTokenParsers {
     { case cs if cs.forall(_.size % 2 == 1) => cs.scanLeft(0 :: Nil) {
         case (c :: _, x :: xs) => x + c :: xs
         case _ => throw new RuntimeException("Will never happen.")
-      }.tail
+      }
     },
     "A cut has an even number of components: %s".format(_)
   )
