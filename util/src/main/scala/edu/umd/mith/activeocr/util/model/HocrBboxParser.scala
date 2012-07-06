@@ -29,7 +29,7 @@ case class HocrBbox(
   items: Option[List[(List[Int], Double)]] = None
 ) extends Bbox {
   def glyphs(cs: Seq[String]): Option[Seq[Glyph]] = this.items.flatMap { is =>
-    if (is.size + 1 == cs.size) Some {
+    if (is.size == cs.size) Some {
       // For now we take the average x values.
       val averaged: List[Int] = is.map {
         case ((x :: ds), _) => x + math.round((0 :: ds).grouped(2).map {
