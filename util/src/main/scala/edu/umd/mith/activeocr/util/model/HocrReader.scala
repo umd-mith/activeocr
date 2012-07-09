@@ -33,20 +33,18 @@ object HocrReader {
     val reader = new XMLEventReader(source)
     while (reader.hasNext) {
       reader.next match {
-        case EvElemStart(_, label, attrs, _) =>
-          if (label == "div") {
-            val clss = attrs.asAttrMap.getOrElse("class", "")
-            if (clss == "ocr_page") {
-              val page = makeNewPage(
-                reader, attrs, "../data/luxmundi.jpeg", 680, 1149
-              )
-              val formatter = new scala.xml.PrettyPrinter(80, 2)
-              val printer = new java.io.PrintWriter("luxmundi1.svg")
-              printer.println(formatter.format(page.toSVG))
-              printer.close()
-            }
+        case EvElemStart(_, "div", attrs, _) =>
+          val clss = attrs.asAttrMap.getOrElse("class", "")
+          if (clss == "ocr_page") {
+            val page = makeNewPage(
+              reader, attrs, "../data/luxmundi.jpeg", 680, 1149
+            )
+            val formatter = new scala.xml.PrettyPrinter(80, 2)
+            val printer = new java.io.PrintWriter("luxmundi1.svg")
+            printer.println(formatter.format(page.toSVG))
+            printer.close()
           }
-
+        case EvElemStart(_, label, attrs, _) => ()
         case EvElemEnd(_, label) => ()
         case EvText(text) => assume(text.trim.isEmpty)
       }
@@ -62,14 +60,13 @@ object HocrReader {
       while (reader.hasNext) {
         val event = reader.next
         event match {
-          case EvElemStart(_, "div", attrs, _) => {
+          case EvElemStart(_, "div", attrs, _) =>
             val clss = attrs.asAttrMap.getOrElse("class", "")
             if (clss == "ocr_carea") {
               page = page.addChild(makeNewZone(reader, attrs))
             }
-          }
-          case EvElemEnd(_, label) => { break }
-          case EvText(text) => { assume(text.trim.isEmpty) }
+          case EvElemEnd(_, label) => break
+          case EvText(text) => assume(text.trim.isEmpty)
         }
       }
     }
@@ -85,24 +82,15 @@ object HocrReader {
       while (reader.hasNext) {
         val event = reader.next
         event match {
-          case EvElemStart(_, "p", attrs, _) => { 
-            println("<p> Start")
-          }
-          case EvElemEnd(_, "p") => {
-            println("<p> End")
-          }
-          case EvElemStart(_, "span" , attrs, _) => {
+          case EvElemStart(_, "p", attrs, _) => println("<p> Start")
+          case EvElemEnd(_, "p") => println("<p> End")
+          case EvElemStart(_, "span" , attrs, _) =>
             val clss = attrs.asAttrMap.getOrElse("class", "")
             if (clss == "ocr_line") {
               zone = zone.addChild(makeNewLine(reader, attrs))
             }
-          }
-          case EvElemEnd(_, "div") => {
-            break
-          }
-          case EvText(text) => {
-            assume(text.trim.isEmpty)
-          }
+          case EvElemEnd(_, "div") => break
+          case EvText(text) => assume(text.trim.isEmpty)
         }
       }
     }
@@ -118,16 +106,13 @@ object HocrReader {
       while (reader.hasNext) {
         val event = reader.next
         event match {
-          case EvElemStart(_, label, attrs, _) => {
-            if (label == "span") {
-              val clss = attrs.asAttrMap.getOrElse("class", "")
-              if (clss == "ocr_word") {
-                line = line.addChild(makeNewWord(reader, attrs))
-              }
+          case EvElemStart(_, "span" , attrs, _) =>
+            val clss = attrs.asAttrMap.getOrElse("class", "")
+            if (clss == "ocr_word") {
+              line = line.addChild(makeNewWord(reader, attrs))
             }
-          }
-          case EvElemEnd(_, label) => { break }
-          case EvText(text) => { assume(text.trim.isEmpty) }
+          case EvElemEnd(_, label) => break
+          case EvText(text) => assume(text.trim.isEmpty)
         }
       }
     }
