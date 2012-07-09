@@ -45,6 +45,10 @@ case class HocrBbox(
     } else None
   }
   def glyphs(cs: String): Option[Seq[Glyph]] = this.glyphs(cs.map(_.toString))
+
+  def toWord(cs: String): Word = this.glyphs(cs).map(
+    gs => ContWord(gs.toIndexedSeq)
+  ).getOrElse(TermWord(cs, this.x, this.y, this.w, this.h))
 }
 
 // This is a quick draft of a parser for hOCR bounding box specifications
