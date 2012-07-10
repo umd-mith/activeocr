@@ -41,7 +41,9 @@ object TessReader {
             val page = makeNewPage(
               reader, attrs, "../data/luxmundi.jpeg", 680, 1149
             )
-            println(page)
+            val formatter = new scala.xml.PrettyPrinter(80, 2)
+            val printer = new java.io.PrintWriter("luxmundi3.svg")
+            printer.println(formatter.format(page.toSVG))
           }
           else assert(false, "Unexpected <div>.")
         case EvElemStart(_, "title", attrs, _) => eatTitle(reader)
@@ -97,30 +99,72 @@ object TessReader {
   }
 
   def makeNewLine(reader: XMLEventReader, attributes: MetaData): Line = {
+    val id = attributes.asAttrMap.getOrElse("id", "")
+    println(id + " Start")
     var line = new ContLine(IndexedSeq[Word]())
     breakable {
       while (reader.hasNext) {
         val event = reader.next
         event match {
         // reader.next match
-          case EvElemEnd(_, label) => ()
+          case EvElemEnd(_, label) => break
           case EvElemStart(_, "span", attrs, _) =>
             val clss = attrs.asAttrMap.getOrElse("class", "")
-            if (clss == "ocr_word") {
+            // if (clss == "ocr_word") {
+            if (clss == "ocrx_word") {
               line = line.addChild(makeNewWord(reader, attrs))
             }
           case EvElemStart(_, label, attrs, _) => ()
           case EvEntityRef(_) => ()
-          case EvText(text) => println(text)
+          case EvText(text) => assume(text.trim.isEmpty)
         }
       }
     }
+    println(id + " End")
     line
   }
 
   def makeNewWord(reader: XMLEventReader, attributes: MetaData): Word = {
-    var word = new TermWord("", 0, 0, 0, 0)
+    val title = attributes.asAttrMap.getOrElse("title", "")
+    
+    val matchString = """(bbox \d+ \d+ \d+ \d+); cuts$"""
+    val Re = matchString.r
+    if (title.matches(matchString)) {
+      val Re(bboxOnly) = title
+      println(HocrBboxParser(bboxOnly).get)
+    } else println(HocrBboxParser(title).get)
+
+    val id = attributes.asAttrMap.getOrElse("id", "")
+    val (x, y, w, h) = unpackDimensions(title)
+    var tmpWord = ""
+    println(id + " Start")
+    breakable {
+      while (reader.hasNext) {
+        val event = reader.next
+        event match {
+          case EvElemStart(_, "em", _, _) => println("<em> Start")
+          case EvElemEnd(_, "em") => println("<em> End")
+          case EvElemStart(_, "strong", _, _) => println("<strong> Start")
+          case EvElemEnd(_, "strong") => println("<strong> End")
+          case EvElemStart(_, "span", _, _) => assert(false)
+          case EvElemEnd(_, "span") => break
+          case EvText(text) => tmpWord = text
+          case _ => ()
+        }
+      }
+    }
+    val word = new TermWord(tmpWord, x, y, w, h)
+    println(id + " End")
     word
+  }
+
+  def unpackDimensions(title: String): (Int, Int, Int, Int) = {
+    val Re = ".*bbox (\\d+) (\\d+) (\\d+) (\\d+); cuts.*".r
+    val Re(x0, y0, x1, y1) = title
+    val x = x0.toInt; val y = y0.toInt
+    val w = x1.toInt - x0.toInt
+    val h = y1.toInt - y0.toInt
+    (x, y, w, h)
   }
 
   def eatTitle(reader: XMLEventReader) = {

@@ -130,26 +130,19 @@ object HocrReader {
       while (reader.hasNext) {
         val event = reader.next
         event match {
-          case EvElemStart(_, label, attrs, _) => {
+          case EvElemStart(_, label, attrs, _) =>
             if (label == "span") {
               val clss = attrs.asAttrMap.getOrElse("class", "")
               if (clss == "ocrx_word") {
                 tmpWord = eatXword(reader, attrs)
-                // tmpWord = eatWord(reader)
                 println(tmpWord)
               }
             }
-          }
-          case EvElemEnd(_, label) => { break }
-          case EvText(text) => { assume(text.trim.isEmpty) }
+          case EvElemEnd(_, label) => break
+          case EvText(text) => assume(text.trim.isEmpty)
         }
       }
     }
-    /*
-    val glyphs: IndexedSeq[Glyph] =
-      tmpWord.map(c => Glyph(c.toString, x, y, w, h)) 
-    val word = new ContWord(glyphs)
-     */
     val word = new TermWord(tmpWord, x, y, w, h)
     println(id + " End")
     word
@@ -171,14 +164,12 @@ object HocrReader {
       while (reader.hasNext) {
         val event = reader.next
         event match {
-          case EvElemStart(_, "em", _, _) => { println("<em> Start") }
-          case EvElemEnd(_, "em") => { println("<em> End") }
-          case EvElemStart(_, "strong", _, _) => { println("<strong> Start") }
-          case EvElemEnd(_, "strong") => { println("<strong> End") }
+          case EvElemStart(_, "em", _, _) => println("<em> Start")
+          case EvElemEnd(_, "em") => println("<em> End")
+          case EvElemStart(_, "strong", _, _) => println("<strong> Start")
+          case EvElemEnd(_, "strong") => println("<strong> End")
           case EvElemEnd(_, "span") => break
-          case EvText(text) => {
-            tmp = text
-          }
+          case EvText(text) => tmp = text
           case _ => ()
         }
       }
