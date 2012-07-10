@@ -32,9 +32,7 @@ object TessReader {
     )
     val reader = new XMLEventReader(source)
     while (reader.hasNext) {
-      val event = reader.next
-      event match {
-      // reader.next match {
+      reader.next match {
         case EvElemStart(_, "div", attrs, _) =>
           val clss = attrs.asAttrMap.getOrElse("class", "")
           if (clss == "ocr_page") {
@@ -44,33 +42,32 @@ object TessReader {
             val formatter = new scala.xml.PrettyPrinter(80, 2)
             val printer = new java.io.PrintWriter("luxmundi3.svg")
             printer.println(formatter.format(page.toSVG))
+            printer.close()
           }
           else assert(false, "Unexpected <div>.")
-        case EvElemStart(_, "title", attrs, _) => eatTitle(reader)
-        case EvElemStart(_, "body"|"head"|"html"|"meta", attrs, _) => ()
-        case EvElemEnd(_, "body"|"head"|"html"|"meta") => ()
+        case EvElemStart(_, "body"|"head"|"html"|"meta"|"title", attrs, _) => ()
+        case EvElemEnd(_, "body"|"head"|"html"|"meta"|"title") => ()
         case EvText(text) => assume(text.trim.isEmpty)
         case _ => assert(false, "Unexpected XML event.")
       }
     }
   }
 
-  def makeNewPage(reader: XMLEventReader, attributes: MetaData, uri: String, imageW: Int, imageH: Int): Page = {
+  def makeNewPage(reader: XMLEventReader, attributes: MetaData,
+      uri: String, imageW: Int, imageH: Int): Page = {
     var page = new Page(IndexedSeq[Zone](), uri, imageW, imageH)
     breakable {
       while (reader.hasNext) {
-        val event = reader.next
-        event match {
-        // reader.next match {
-          case EvElemStart(_, "div", attrs, _) => {
+        reader.next match {
+          case EvElemEnd(_, "div") => break
+          case EvElemStart(_, "div", attrs, _) =>
             val clss = attrs.asAttrMap.getOrElse("class", "")
             if (clss == "ocr_carea") {
               page = page.addChild(makeNewZone(reader, attrs))
             }
-          }
-          case EvElemStart(_, label, attrs, _) => ()
-          case EvElemEnd(_, label) => break
+            else assert(false, "Unexpected <div>.")
           case EvText(text) => assume(text.trim.isEmpty)
+          case _ => assert(false, "Unexpected XML event.")
         }
       }
     }
@@ -81,17 +78,18 @@ object TessReader {
     var zone = new Zone(IndexedSeq[Line]())
     breakable {
       while (reader.hasNext) {
-        val event = reader.next
-        event match {
-        // reader.next match
-          case EvElemEnd(_, label) => ()
+        reader.next match {
+          case EvElemEnd(_, "div") => break
           case EvElemStart(_, "span", attrs, _) =>
             val clss = attrs.asAttrMap.getOrElse("class", "")
             if (clss == "ocr_line") {
               zone = zone.addChild(makeNewLine(reader, attrs))
             }
-          case EvElemStart(_, label, attrs, _) => ()
+            else assert(false, "Unexpected <span>.")
+          case EvElemStart(_, "p", attrs, _) => () // do nothing
+          case EvElemEnd(_, "p") => () // do nothing
           case EvText(text) => assume(text.trim.isEmpty)
+          case _ => assert(false, "Unexpected XML event.")
         }
       }
     }
@@ -99,49 +97,39 @@ object TessReader {
   }
 
   def makeNewLine(reader: XMLEventReader, attributes: MetaData): Line = {
-    val id = attributes.asAttrMap.getOrElse("id", "")
-    println(id + " Start")
     var line = new ContLine(IndexedSeq[Word]())
     breakable {
       while (reader.hasNext) {
-        val event = reader.next
-        event match {
-        // reader.next match
-          case EvElemEnd(_, label) => break
+        reader.next match {
+          case EvElemEnd(_, "span") => break
           case EvElemStart(_, "span", attrs, _) =>
             val clss = attrs.asAttrMap.getOrElse("class", "")
-            // if (clss == "ocr_word") {
             if (clss == "ocrx_word") {
               line = line.addChild(makeNewWord(reader, attrs))
             }
-          case EvElemStart(_, label, attrs, _) => ()
-          case EvEntityRef(_) => ()
+            else assert(false, "Unexpected <span>.")
           case EvText(text) => assume(text.trim.isEmpty)
+          case _ => assert(false, "Unexpected XML event.")
         }
       }
     }
-    println(id + " End")
     line
   }
 
   def makeNewWord(reader: XMLEventReader, attributes: MetaData): Word = {
     val title = attributes.asAttrMap.getOrElse("title", "")
-    val id = attributes.asAttrMap.getOrElse("id", "")
     val (x, y, w, h) = unpackDimensions(title)
     var tmpWord = ""
-    println(id + " Start")
     breakable {
       while (reader.hasNext) {
         val event = reader.next
         event match {
-          case EvElemStart(_, "em", _, _) => println("<em> Start")
-          case EvElemEnd(_, "em") => println("<em> End")
-          case EvElemStart(_, "strong", _, _) => println("<strong> Start")
-          case EvElemEnd(_, "strong") => println("<strong> End")
-          case EvElemStart(_, "span", _, _) => assert(false)
           case EvElemEnd(_, "span") => break
+          case EvElemStart(_, "em"|"strong", _, _) => ()
+          case EvElemEnd(_, "em"|"strong") => ()
+          case EvEntityRef(text) => () // not sure what to do with this
           case EvText(text) => tmpWord = text
-          case _ => ()
+          case _ => assert(false, "Unexpected XML event.")
         }
       }
     }
@@ -149,18 +137,13 @@ object TessReader {
     val bboxAndCuts = title
     val matchString = """(bbox \d+ \d+ \d+ \d+); cuts$"""
     val Re = matchString.r
-    // val word = new TermWord(tmpWord, x, y, w, h)
     if (bboxAndCuts.matches(matchString)) {
       val Re(bboxOnly) = bboxAndCuts
-      println(HocrBboxParser(bboxOnly).get.toWord(tmpWord))
       val word = HocrBboxParser(bboxOnly).get.toWord(tmpWord)
-      println (id + " End")
       word
     }
     else {
-      println(HocrBboxParser(bboxAndCuts).get.toWord(tmpWord))
       val word = HocrBboxParser(bboxAndCuts).get.toWord(tmpWord)
-      println(id + " End")
       word
     }
   }
@@ -173,27 +156,5 @@ object TessReader {
     val h = y1.toInt - y0.toInt
     (x, y, w, h)
   }
-
-  def eatTitle(reader: XMLEventReader) = {
-    breakable {
-      while (reader.hasNext) {
-        val event = reader.next
-        event match {
-          case EvElemEnd(_, "title") => break
-          case EvText(text) => ()
-        }
-      }
-    }
-  }
-
-  // Don't need this after all right now, but it's potentially useful (TB).
-  private def eatElement(reader: XMLEventReader) {
-    var depth = 1
-    while (reader.hasNext && depth > 0) {
-      reader.next match {
-        case _: EvElemStart => depth + 1
-        case _: EvElemEnd => depth - 1
-      }
-    }
-  }
 }
+
