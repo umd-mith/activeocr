@@ -126,14 +126,6 @@ object TessReader {
 
   def makeNewWord(reader: XMLEventReader, attributes: MetaData): Word = {
     val title = attributes.asAttrMap.getOrElse("title", "")
-    
-    val matchString = """(bbox \d+ \d+ \d+ \d+); cuts$"""
-    val Re = matchString.r
-    if (title.matches(matchString)) {
-      val Re(bboxOnly) = title
-      println(HocrBboxParser(bboxOnly).get)
-    } else println(HocrBboxParser(title).get)
-
     val id = attributes.asAttrMap.getOrElse("id", "")
     val (x, y, w, h) = unpackDimensions(title)
     var tmpWord = ""
@@ -153,9 +145,24 @@ object TessReader {
         }
       }
     }
-    val word = new TermWord(tmpWord, x, y, w, h)
-    println(id + " End")
-    word
+
+    val bboxAndCuts = title
+    val matchString = """(bbox \d+ \d+ \d+ \d+); cuts$"""
+    val Re = matchString.r
+    // val word = new TermWord(tmpWord, x, y, w, h)
+    if (bboxAndCuts.matches(matchString)) {
+      val Re(bboxOnly) = bboxAndCuts
+      println(HocrBboxParser(bboxOnly).get.toWord(tmpWord))
+      val word = HocrBboxParser(bboxOnly).get.toWord(tmpWord)
+      println (id + " End")
+      word
+    }
+    else {
+      println(HocrBboxParser(bboxAndCuts).get.toWord(tmpWord))
+      val word = HocrBboxParser(bboxAndCuts).get.toWord(tmpWord)
+      println(id + " End")
+      word
+    }
   }
 
   def unpackDimensions(title: String): (Int, Int, Int, Int) = {
