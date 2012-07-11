@@ -41,6 +41,7 @@ object TessReader {
             )
             val formatter = new scala.xml.PrettyPrinter(80, 2)
             val printer = new java.io.PrintWriter("luxmundi3.svg")
+            println(page)
             printer.println(formatter.format(page.toSVG))
             printer.close()
           }
