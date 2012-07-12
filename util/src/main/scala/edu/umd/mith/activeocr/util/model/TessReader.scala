@@ -26,21 +26,26 @@ import scala.xml.pull._
 
 object TessReader {
   def main(args: Array[String]) {
-    val filename = "/luxmundi3.html"
+    val filename = "/luxmundi302.html"
     val source = Source.fromInputStream(
       getClass.getResourceAsStream(filename)
     )
     val reader = new XMLEventReader(source)
+    val pages = parsePage(reader)
+  }
+
+  def parsePage(reader: XMLEventReader): Seq[Page] = {
+    var pages = Seq[Page]()
     while (reader.hasNext) {
       reader.next match {
         case EvElemStart(_, "div", attrs, _) =>
           val clss = attrs.asAttrMap.getOrElse("class", "")
           if (clss == "ocr_page") {
             val page = makeNewPage(
-              reader, attrs, "../data/luxmundi.jpeg", 680, 1149
+              reader, attrs, "../data/luxmundi.tiff", 680, 1149
             )
             val formatter = new scala.xml.PrettyPrinter(80, 2)
-            val printer = new java.io.PrintWriter("luxmundi3.svg")
+            val printer = new java.io.PrintWriter("luxmundi302.svg")
             println(page)
             printer.println(formatter.format(page.toSVG))
             printer.close()
@@ -52,11 +57,17 @@ object TessReader {
         case _ => assert(false, "Unexpected XML event.")
       }
     }
+    pages
   }
 
   def makeNewPage(reader: XMLEventReader, attributes: MetaData,
       uri: String, imageW: Int, imageH: Int): Page = {
-    var page = new Page(IndexedSeq[Zone](), uri, imageW, imageH)
+
+    val image = org.apache.sanselan.Sanselan.getBufferedImage(
+      new java.io.File(uri)
+    )
+
+    var page = new Page(IndexedSeq[Zone](), uri, image.getWidth, image.getHeight)
     breakable {
       while (reader.hasNext) {
         reader.next match {
