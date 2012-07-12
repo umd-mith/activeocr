@@ -24,9 +24,9 @@ import scala.util.control.Breaks._
 import scala.xml.MetaData
 import scala.xml.pull._
 
-object HocrReader {
+object Tess301Reader {
   def main(args: Array[String]) {
-    val filename = "/luxmundi1.html"
+    val filename = "/luxmundi301.html"
     val source = Source.fromInputStream(
       getClass.getResourceAsStream(filename)
     )
@@ -40,7 +40,7 @@ object HocrReader {
               reader, attrs, "../data/luxmundi.jpeg", 680, 1149
             )
             val formatter = new scala.xml.PrettyPrinter(80, 2)
-            val printer = new java.io.PrintWriter("luxmundi1.svg")
+            val printer = new java.io.PrintWriter("luxmundi301.svg")
             printer.println(formatter.format(page.toSVG))
             printer.close()
           }
