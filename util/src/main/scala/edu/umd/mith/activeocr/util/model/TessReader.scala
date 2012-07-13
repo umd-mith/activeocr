@@ -19,7 +19,6 @@
  */
 package edu.umd.mith.activeocr.util.model
 
-import scala.io._
 import scala.util.control.Breaks._
 import scala.xml.MetaData
 import scala.xml.pull._

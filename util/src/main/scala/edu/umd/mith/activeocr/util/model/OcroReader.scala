@@ -24,7 +24,7 @@ import scala.util.control.Breaks._
 import scala.xml.MetaData
 import scala.xml.pull._
 
-object OcroReader {
+object OcroReader extends HocrReader {
   def main(args: Array[String]) {
     val filename = "/luxmundi2.html"
     val source = Source.fromInputStream(
