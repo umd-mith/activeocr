@@ -31,7 +31,7 @@ object Tmp {
     val reader = new XMLEventReader(source)
     val formatter = new scala.xml.PrettyPrinter(80, 2)
     val printer = new java.io.PrintWriter("luxmundi302.svg")
-    val pages = TessReader.parsePage(reader, "../data/luxmundi.tiff")
+    val pages = TessReader.parsePage(reader, this.getClass.getResource("/luxmundi.tiff").toURI)
     for (page <- pages) {
       printer.println(formatter.format(page.toSVG))
     }

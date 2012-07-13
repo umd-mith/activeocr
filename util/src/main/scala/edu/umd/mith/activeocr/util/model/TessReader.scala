@@ -19,12 +19,13 @@
  */
 package edu.umd.mith.activeocr.util.model
 
+import java.net.URI
 import scala.util.control.Breaks._
 import scala.xml.MetaData
 import scala.xml.pull._
 
 object TessReader extends HocrReader {
-  def parsePage(reader: XMLEventReader, facsimileUri: String): Seq[Page] = {
+  def parsePage(reader: XMLEventReader, facsimileUri: URI): Seq[Page] = {
     var pages = Seq[Page]()
     val image = org.apache.sanselan.Sanselan.getBufferedImage(
       new java.io.File(facsimileUri)
@@ -43,6 +44,7 @@ object TessReader extends HocrReader {
         case EvElemStart(_, "body"|"head"|"html"|"meta"|"title", attrs, _) => ()
         case EvElemEnd(_, "body"|"head"|"html"|"meta"|"title") => ()
         case EvText(text) => assume(text.trim.isEmpty)
+        case _: EvComment => ()
         case _ => assert(false, "Unexpected XML event.")
       }
     }
@@ -50,8 +52,8 @@ object TessReader extends HocrReader {
   }
 
   def makeNewPage(reader: XMLEventReader, attributes: MetaData,
-      uri: String, imageW: Int, imageH: Int): Page = {
-    var page = new Page(IndexedSeq[Zone](), uri, imageW, imageH)
+      uri: URI, imageW: Int, imageH: Int): Page = {
+    var page = new Page(IndexedSeq[Zone](), uri.toString, imageW, imageH)
     breakable {
       while (reader.hasNext) {
         reader.next match {
