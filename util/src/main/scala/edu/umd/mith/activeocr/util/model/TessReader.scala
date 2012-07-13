@@ -24,22 +24,7 @@ import scala.util.control.Breaks._
 import scala.xml.MetaData
 import scala.xml.pull._
 
-object TessReader {
-  def main(args: Array[String]): Unit = {
-    val filename = "/luxmundi302.html"
-    val source = Source.fromInputStream(
-      getClass.getResourceAsStream(filename)
-    )
-    val reader = new XMLEventReader(source)
-    val formatter = new scala.xml.PrettyPrinter(80, 2)
-    val printer = new java.io.PrintWriter("luxmundi302.svg")
-    val pages = parsePage(reader, "../data/luxmundi.tiff")
-    for (page <- pages) {
-      printer.println(formatter.format(page.toSVG))
-    }
-    printer.close()
-  }
-
+object TessReader extends HocrReader {
   def parsePage(reader: XMLEventReader, facsimileUri: String): Seq[Page] = {
     var pages = Seq[Page]()
     val image = org.apache.sanselan.Sanselan.getBufferedImage(
