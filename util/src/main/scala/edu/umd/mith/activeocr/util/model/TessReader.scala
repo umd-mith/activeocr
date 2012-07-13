@@ -25,30 +25,35 @@ import scala.xml.MetaData
 import scala.xml.pull._
 
 object TessReader {
-  def main(args: Array[String]) {
+  def main(args: Array[String]): Unit = {
     val filename = "/luxmundi302.html"
     val source = Source.fromInputStream(
       getClass.getResourceAsStream(filename)
     )
     val reader = new XMLEventReader(source)
-    val pages = parsePage(reader)
+    val formatter = new scala.xml.PrettyPrinter(80, 2)
+    val printer = new java.io.PrintWriter("luxmundi302.svg")
+    val pages = parsePage(reader, "../data/luxmundi.tiff")
+    for (page <- pages) {
+      printer.println(formatter.format(page.toSVG))
+    }
+    printer.close()
   }
 
-  def parsePage(reader: XMLEventReader): Seq[Page] = {
+  def parsePage(reader: XMLEventReader, facsimileUri: String): Seq[Page] = {
     var pages = Seq[Page]()
+    val image = org.apache.sanselan.Sanselan.getBufferedImage(
+      new java.io.File(facsimileUri)
+    )
     while (reader.hasNext) {
       reader.next match {
         case EvElemStart(_, "div", attrs, _) =>
           val clss = attrs.asAttrMap.getOrElse("class", "")
           if (clss == "ocr_page") {
             val page = makeNewPage(
-              reader, attrs, "../data/luxmundi.tiff", 680, 1149
+              reader, attrs, facsimileUri, image.getWidth, image.getHeight
             )
-            val formatter = new scala.xml.PrettyPrinter(80, 2)
-            val printer = new java.io.PrintWriter("luxmundi302.svg")
-            println(page)
-            printer.println(formatter.format(page.toSVG))
-            printer.close()
+            pages = pages :+ page
           }
           else assert(false, "Unexpected <div>.")
         case EvElemStart(_, "body"|"head"|"html"|"meta"|"title", attrs, _) => ()
@@ -62,12 +67,7 @@ object TessReader {
 
   def makeNewPage(reader: XMLEventReader, attributes: MetaData,
       uri: String, imageW: Int, imageH: Int): Page = {
-
-    val image = org.apache.sanselan.Sanselan.getBufferedImage(
-      new java.io.File(uri)
-    )
-
-    var page = new Page(IndexedSeq[Zone](), uri, image.getWidth, image.getHeight)
+    var page = new Page(IndexedSeq[Zone](), uri, imageW, imageH)
     breakable {
       while (reader.hasNext) {
         reader.next match {
