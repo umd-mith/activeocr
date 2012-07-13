@@ -19,30 +19,25 @@
  */
 package edu.umd.mith.activeocr.util.model
 
-import scala.io._
 import scala.util.control.Breaks._
 import scala.xml.MetaData
 import scala.xml.pull._
 
 object OcroReader extends HocrReader {
-  def main(args: Array[String]) {
-    val filename = "/luxmundi2.html"
-    val source = Source.fromInputStream(
-      getClass.getResourceAsStream(filename)
+  def parsePage(reader: XMLEventReader, facsimileUri: String): Seq[Page] = {
+    var pages = Seq[Page]()
+    var image = org.apache.sanselan.Sanselan.getBufferedImage(
+      new java.io.File(facsimileUri)
     )
-    val reader = new XMLEventReader(source)
     while (reader.hasNext) {
       reader.next match {
         case EvElemStart(_, "div", attrs, _) =>
           val clss = attrs.asAttrMap.getOrElse("class", "")
           if (clss == "ocr_page") {
             val page = makeNewPageZone(
-              reader, attrs, "../data/luxmundi.jpeg", 680, 1149
+              reader, attrs, facsimileUri, image.getWidth, image.getHeight
             )
-            val formatter = new scala.xml.PrettyPrinter(80, 2)
-            val printer = new java.io.PrintWriter("luxmundi2.svg")
-            printer.println(formatter.format(page.toSVG))
-            printer.close()
+            pages = pages :+ page
           }
         case EvElemStart(_, "title", _, _) => eatTitle(reader)
         case EvElemStart(_, "body"|"head"|"html"|"meta", _, _) => ()
@@ -50,7 +45,7 @@ object OcroReader extends HocrReader {
         case EvText(text) => assume(text.trim.isEmpty)
       }
     }
-    source.close
+    pages
   }
 
   def makeNewPageZone(reader: XMLEventReader, attributes: MetaData, uri: String, imageW: Int, imageH: Int): Page = {
