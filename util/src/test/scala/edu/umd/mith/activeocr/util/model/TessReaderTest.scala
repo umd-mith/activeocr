@@ -50,10 +50,6 @@ class TessReaderTest extends SpecificationWithJUnit with TessExample {
       }
       glyph must beSome(Glyph("g", 318, 575, 15, 21))
     }
-
-    "produce correct SVG" in {
-      this.svg must_== this.targetSVG
-    }
   }
 }
 
@@ -70,11 +66,6 @@ trait TessExample extends Scope {
     this.getClass.getResource("/luxmundi.png").toURI
   )
 
-  val targetSVG = xml.XML.load(
-    this.getClass.getResourceAsStream("/luxmundi302.svg")
-  )
-
-  val svg = this.pages.head.toSVG
   source.close()
 }
 
