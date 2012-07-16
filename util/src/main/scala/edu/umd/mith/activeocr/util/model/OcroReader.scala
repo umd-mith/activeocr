@@ -19,12 +19,13 @@
  */
 package edu.umd.mith.activeocr.util.model
 
+import java.net.URI
 import scala.util.control.Breaks._
 import scala.xml.MetaData
 import scala.xml.pull._
 
 object OcroReader extends HocrReader {
-  def parsePage(reader: XMLEventReader, facsimileUri: String): Seq[Page] = {
+  def parsePage(reader: XMLEventReader, facsimileUri: URI): Seq[Page] = {
     var pages = Seq[Page]()
     var image = org.apache.sanselan.Sanselan.getBufferedImage(
       new java.io.File(facsimileUri)
@@ -48,7 +49,7 @@ object OcroReader extends HocrReader {
     pages
   }
 
-  def makeNewPageZone(reader: XMLEventReader, attributes: MetaData, uri: String, imageW: Int, imageH: Int): Page = {
+  def makeNewPageZone(reader: XMLEventReader, attributes: MetaData, uri: URI, imageW: Int, imageH: Int): Page = {
     var zone = new Zone(IndexedSeq[Line]())
     breakable {
       while (reader.hasNext) {
@@ -67,7 +68,7 @@ object OcroReader extends HocrReader {
         }
       }
     }
-    var page = new Page(IndexedSeq[Zone](), uri, imageW, imageH)
+    var page = new Page(IndexedSeq[Zone](), uri.toString, imageW, imageH)
     page = page.addChild(zone)
     page
   }

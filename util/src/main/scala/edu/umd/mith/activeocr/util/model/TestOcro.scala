@@ -31,7 +31,7 @@ object TestOcro {
     val reader = new XMLEventReader(source)
     val formatter = new scala.xml.PrettyPrinter(80, 2)
     val printer = new java.io.PrintWriter("luxmundi2.svg")
-    val pages = OcroReader.parsePage(reader, "../data/luxmundi.tiff")
+    val pages = OcroReader.parsePage(reader, this.getClass.getResource("/luxmundi.tiff").toURI)
     for (page <- pages) {
       printer.println(formatter.format(page.toSVG))
     }
