@@ -44,6 +44,7 @@ object OcroReader extends HocrReader {
         case EvElemStart(_, "body"|"head"|"html"|"meta", _, _) => ()
         case EvElemEnd(_, "body"|"head"|"html"|"meta") => ()
         case EvText(text) => assume(text.trim.isEmpty)
+        case _: EvComment => ()
       }
     }
     pages
