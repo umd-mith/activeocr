@@ -22,7 +22,7 @@ package edu.umd.mith.activeocr.util.model
 import scala.io._
 import scala.xml.pull._
 
-object Tmp {
+object Test302 {
   def main(args: Array[String]): Unit = {
     val filename = "/luxmundi302.html"
     val source = Source.fromInputStream(
@@ -31,7 +31,7 @@ object Tmp {
     val reader = new XMLEventReader(source)
     val formatter = new scala.xml.PrettyPrinter(80, 2)
     val printer = new java.io.PrintWriter("luxmundi302.svg")
-    val pages = TessReader.parsePage(reader, this.getClass.getResource("/luxmundi.tiff").toURI)
+    val pages = TessReader.parsePage(reader, this.getClass.getResource("/luxmundi.jpeg").toURI)
     for (page <- pages) {
       printer.println(formatter.format(page.toSVG))
     }

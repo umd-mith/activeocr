@@ -19,9 +19,7 @@
  */
 package edu.umd.mith.activeocr.util.model
 
-import java.io.File
 import java.net.URI
-import javax.media.jai.JAI
 import scala.util.control.Breaks._
 import scala.xml.MetaData
 import scala.xml.pull._
@@ -29,7 +27,9 @@ import scala.xml.pull._
 object OcroReader extends HocrReader {
   def parsePage(reader: XMLEventReader, facsimileUri: URI): Seq[Page] = {
     var pages = Seq[Page]()
-    val image = JAI.create("fileload", new File(facsimileUri).getPath)
+    val image = javax.media.jai.JAI.create(
+      "fileload", new java.io.File(facsimileUri).getPath
+    )
     while (reader.hasNext) {
       reader.next match {
         case EvElemStart(_, "div", attrs, _) =>

@@ -19,9 +19,7 @@
  */
 package edu.umd.mith.activeocr.util.model
 
-import java.io.File
 import java.net.URI
-import javax.media.jai.JAI
 import scala.util.control.Breaks._
 import scala.xml.MetaData
 import scala.xml.pull._
@@ -29,7 +27,9 @@ import scala.xml.pull._
 object TessReader extends HocrReader {
   def parsePage(reader: XMLEventReader, facsimileUri: URI): Seq[Page] = {
     var pages = Seq[Page]()
-    val image = JAI.create("fileload", new File(facsimileUri).getPath)
+    val image = javax.media.jai.JAI.create(
+      "fileload", new java.io.File(facsimileUri).getPath
+    )
     while (reader.hasNext) {
       reader.next match {
         case EvElemStart(_, "div", attrs, _) =>
@@ -135,15 +135,15 @@ object TessReader extends HocrReader {
     val bboxAndCuts = title
     val matchString = """(bbox \d+ \d+ \d+ \d+); cuts$"""
     val Re = matchString.r
-    if (bboxAndCuts.matches(matchString)) {
-      val Re(bboxOnly) = bboxAndCuts
-      val word = HocrBboxParser(bboxOnly).get.toWord(tmpWord)
-      word
-    }
-    else {
-      val word = HocrBboxParser(bboxAndCuts).get.toWord(tmpWord)
-      word
-    }
+    val word = 
+      if (bboxAndCuts.matches(matchString)) {
+        val Re(bboxOnly) = title
+        HocrBboxParser(bboxOnly).get.toWord(tmpWord)
+      }
+      else {
+        HocrBboxParser(bboxAndCuts).get.toWord(tmpWord)
+      }
+    word
   }
 
   def unpackDimensions(title: String): (Int, Int, Int, Int) = {
