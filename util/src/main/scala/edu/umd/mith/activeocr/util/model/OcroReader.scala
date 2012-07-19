@@ -25,32 +25,7 @@ import scala.xml.MetaData
 import scala.xml.pull._
 
 object OcroReader extends HocrReader {
-  def parsePage(reader: XMLEventReader, facsimileUri: URI): Seq[Page] = {
-    var pages = Seq[Page]()
-    val image = javax.media.jai.JAI.create(
-      "fileload", new java.io.File(facsimileUri).getPath
-    )
-    while (reader.hasNext) {
-      reader.next match {
-        case EvElemStart(_, "div", attrs, _) =>
-          val clss = attrs.asAttrMap.getOrElse("class", "")
-          if (clss == "ocr_page") {
-            val page = makeNewPageZone(
-              reader, attrs, facsimileUri, image.getWidth, image.getHeight
-            )
-            pages = pages :+ page
-          }
-        case EvElemStart(_, "title", _, _) => eatTitle(reader)
-        case EvElemStart(_, "body"|"head"|"html"|"meta", _, _) => ()
-        case EvElemEnd(_, "body"|"head"|"html"|"meta") => ()
-        case EvText(text) => assume(text.trim.isEmpty)
-        case _: EvComment => ()
-      }
-    }
-    pages
-  }
-
-  def makeNewPageZone(reader: XMLEventReader, attributes: MetaData, uri: URI, imageW: Int, imageH: Int): Page = {
+  override def makeNewPage(reader: XMLEventReader, attributes: MetaData, uri: URI, imageW: Int, imageH: Int): Page = {
     var zone = new Zone(IndexedSeq[Line]())
     breakable {
       while (reader.hasNext) {
@@ -99,18 +74,6 @@ object OcroReader extends HocrReader {
     val w = x1.toInt - x0.toInt
     val h = y1.toInt - y0.toInt
     (x, y, w, h)
-  }
-
-  def eatTitle(reader: XMLEventReader) = {
-    breakable {
-      while (reader.hasNext) {
-        val event = reader.next
-        event match {
-          case EvElemEnd(_, "title") => break
-          case EvText(text) => ()
-        }
-      }
-    }
   }
 
   // Don't need this after all right now, but it's potentially useful (TB).

@@ -25,33 +25,7 @@ import scala.xml.MetaData
 import scala.xml.pull._
 
 object TessReader extends HocrReader {
-  def parsePage(reader: XMLEventReader, facsimileUri: URI): Seq[Page] = {
-    var pages = Seq[Page]()
-    val image = javax.media.jai.JAI.create(
-      "fileload", new java.io.File(facsimileUri).getPath
-    )
-    while (reader.hasNext) {
-      reader.next match {
-        case EvElemStart(_, "div", attrs, _) =>
-          val clss = attrs.asAttrMap.getOrElse("class", "")
-          if (clss == "ocr_page") {
-            val page = makeNewPage(
-              reader, attrs, facsimileUri, image.getWidth, image.getHeight
-            )
-            pages = pages :+ page
-          }
-          else assert(false, "Unexpected <div>.")
-        case EvElemStart(_, "body"|"head"|"html"|"meta"|"title", attrs, _) => ()
-        case EvElemEnd(_, "body"|"head"|"html"|"meta"|"title") => ()
-        case EvText(text) => assume(text.trim.isEmpty)
-        case _: EvComment => ()
-        case _ => assert(false, "Unexpected XML event.")
-      }
-    }
-    pages
-  }
-
-  def makeNewPage(reader: XMLEventReader, attributes: MetaData,
+  override def makeNewPage(reader: XMLEventReader, attributes: MetaData,
       uri: URI, imageW: Int, imageH: Int): Page = {
     var page = new Page(IndexedSeq[Zone](), uri.toString, imageW, imageH)
     breakable {
