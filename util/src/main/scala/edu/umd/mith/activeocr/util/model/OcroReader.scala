@@ -66,15 +66,5 @@ object OcroReader extends HocrReader {
     val line = new TermLine(tmpText, x, y, w, h)
     line
   }
-
-  // Don't need this after all right now, but it's potentially useful (TB).
-  private def eatElement(reader: XMLEventReader) {
-    var depth = 1
-    while (reader.hasNext && depth > 0) {
-      reader.next match {
-        case _: EvElemStart => depth + 1
-        case _: EvElemEnd => depth - 1
-      }
-    }
-  }
 }
+
