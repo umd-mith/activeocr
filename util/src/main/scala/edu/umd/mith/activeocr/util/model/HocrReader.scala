@@ -70,5 +70,14 @@ class HocrReader {
       }
     }
   }
+
+  def unpackDimensions(title: String): (Int, Int, Int, Int) = {
+    val Re = ".*bbox (\\d+) (\\d+) (\\d+) (\\d+).*".r
+    val Re(x0, y0, x1, y1) = title
+    val x = x0.toInt; val y = y0.toInt
+    val w = x1.toInt - x0.toInt
+    val h = y1.toInt - y0.toInt
+    (x, y, w, h)
+  }
 }
 
