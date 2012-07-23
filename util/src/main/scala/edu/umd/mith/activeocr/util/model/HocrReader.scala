@@ -20,7 +20,7 @@
 package edu.umd.mith.activeocr.util.model
 
 import java.net.URI
-import javax.media.jai.JAI
+import javax.media.jai._
 import scala.util.control.Breaks._
 import scala.xml.MetaData
 import scala.xml.pull._
