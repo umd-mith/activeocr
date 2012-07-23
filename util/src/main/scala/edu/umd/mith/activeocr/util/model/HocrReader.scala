@@ -20,6 +20,7 @@
 package edu.umd.mith.activeocr.util.model
 
 import java.net.URI
+import javax.media.jai.JAI
 import scala.util.control.Breaks._
 import scala.xml.MetaData
 import scala.xml.pull._
@@ -27,7 +28,7 @@ import scala.xml.pull._
 class HocrReader { 
   def parsePage(reader: XMLEventReader, facsimileUri: URI): Seq[Page] = {
     var pages = Seq[Page]()
-    val image = javax.media.jai.JAI.create(
+    val image = JAI.create(
       "fileload", new java.io.File(facsimileUri).getPath
     )
     while (reader.hasNext) {
