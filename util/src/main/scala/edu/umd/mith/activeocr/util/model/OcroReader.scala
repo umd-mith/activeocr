@@ -25,26 +25,26 @@ import scala.xml.MetaData
 import scala.xml.pull._
 
 object OcroReader extends HocrReader {
-  override def makeNewPage(reader: XMLEventReader, attributes: MetaData, uri: URI, imageW: Int, imageH: Int): Page = {
+  override def makeNewPage(reader: XMLEventReader, attributes: MetaData,
+      uri: URI, imageW: Int, imageH: Int): Page = {
+    var page = new Page(IndexedSeq[Zone](), uri.toString, imageW, imageH)
     var zone = new Zone(IndexedSeq[Line]())
     breakable {
       while (reader.hasNext) {
         val event = reader.next
         event match {
-          case EvElemStart(_, "p", _, _) => { /* ignore */ }
-          case EvElemStart(_, "span", attrs, _) => {
+          case EvElemStart(_, "p", _, _) => ()
+          case EvElemStart(_, "span", attrs, _) =>
             val clss = attrs.asAttrMap.getOrElse("class", "")
-            if (clss == "ocr_line") {
+            if (clss == "ocr_line")
               zone = zone.addChild(makeNewLine(reader, attrs))
-            }
-          }
-          case EvElemEnd(_, "div") => { break }
-          case EvElemEnd(_, "p") => { /* ignore */ }
-          case EvText(text) => { assume(text.trim.isEmpty) }
+          case EvElemEnd(_, "div") => break
+          case EvElemEnd(_, "p") => ()
+          case EvText(text) => assume(text.trim.isEmpty)
+          case _ => assert(false, "Unexpected XML event.")
         }
       }
     }
-    var page = new Page(IndexedSeq[Zone](), uri.toString, imageW, imageH)
     page = page.addChild(zone)
     page
   }
@@ -57,9 +57,9 @@ object OcroReader extends HocrReader {
       while (reader.hasNext) {
         val event = reader.next
         event match {
-          case EvComment(_) => { /* HTML entities */ }
-          case EvElemEnd(_, "span") => { break }
-          case EvText(text) => { tmpText = text }
+          case EvComment(_) => ()
+          case EvElemEnd(_, "span") => break
+          case EvText(text) => tmpText = text
         }
       }
     }
