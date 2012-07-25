@@ -99,8 +99,10 @@ object TessReader extends HocrReader {
           case EvElemEnd(_, "span") => break
           case EvElemStart(_, "em"|"strong", _, _) => ()
           case EvElemEnd(_, "em"|"strong") => ()
-          case EvEntityRef(text) => () // not sure what to do with this
-          case EvText(text) => tmpWord = text
+          case EvEntityRef(text) =>
+            val entity = "&" + text + ";"
+            tmpWord += entity
+          case EvText(text) => tmpWord += text
           case _ => assert(false, "Unexpected XML event.")
         }
       }
