@@ -32,12 +32,12 @@ import javax.imageio.ImageIO
 import org.imgscalr.Scalr._
 
 class ActiveOCR {
-  var img = ImageIO.read(new File("../data/luxmundi.jpeg"))
-  img = resize(img, Method.QUALITY, Mode.FIT_TO_WIDTH, 510)
-  ImageIO.write(img, "jpeg", new File("./src/main/webapp/images/tmp.jpeg"))
+  // var img = ImageIO.read(new File("../data/luxmundi.jpeg"))
+  // img = resize(img, Method.QUALITY, Mode.FIT_TO_WIDTH, 510)
+  // ImageIO.write(img, "jpeg", new File("./src/main/webapp/images/tmp.jpeg"))
 
   def transform(in: NodeSeq): NodeSeq = {
-    <img src="images/tmp.jpeg"/>
+    <img src={"/cached?url=/static/images/luxmundi.png&rw=510"}/>
     <p>{System.getProperty("user.dir")}</p>
   }
 }

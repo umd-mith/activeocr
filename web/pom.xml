@@ -17,6 +17,11 @@
 
   <dependencies>
     <dependency>
+      <groupId>edu.umd.mith</groupId>
+      <artifactId>lift-util</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
       <groupId>net.liftweb</groupId>
       <artifactId>lift-mapper_${scala.version}</artifactId>
       <version>${liftweb.version}</version>

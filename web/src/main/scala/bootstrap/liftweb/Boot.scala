@@ -29,6 +29,7 @@ import Helpers._
 import _root_.net.liftweb.mapper.{DB, ConnectionManager, Schemifier, DefaultConnectionIdentifier, StandardDBVendor}
 import _root_.java.sql.{Connection, DriverManager}
 import _root_.edu.umd.mith.activeocr.web.model._
+import edu.umd.mith.util.lift.image._
 
 
 /**
@@ -51,7 +52,7 @@ class Boot {
 
     // where to search snippet
     LiftRules.addToPackages("edu.umd.mith.activeocr.web")
-    Schemifier.schemify(true, Schemifier.infoF _, User)
+    Schemifier.schemify(true, Schemifier.infoF _, User, SourceImage, DerivativeImage, ImageSelection)
 
     // Build SiteMap
     def sitemap() = SiteMap(
@@ -78,6 +79,8 @@ class Boot {
     LiftRules.early.append(makeUtf8)
 
     LiftRules.loggedInTest = Full(() => User.loggedIn_?)
+
+    LiftRules.dispatch.append(new ImageCache("cached" :: Nil).matcher)
 
     S.addAround(DB.buildLoanWrapper)
   }
