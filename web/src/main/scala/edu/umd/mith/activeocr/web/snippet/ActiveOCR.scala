@@ -27,18 +27,20 @@ import _root_.java.util.Date
 import edu.umd.mith.activeocr.web.lib._
 import Helpers._
 
+import edu.umd.mith.activeocr.util.model._
 import java.io.File
 import javax.imageio.ImageIO
-import org.imgscalr.Scalr._
+import scala.io.Source
+import scala.xml.pull.XMLEventReader
 
 class ActiveOCR {
-  // var img = ImageIO.read(new File("../data/luxmundi.jpeg"))
-  // img = resize(img, Method.QUALITY, Mode.FIT_TO_WIDTH, 510)
-  // ImageIO.write(img, "jpeg", new File("./src/main/webapp/images/tmp.jpeg"))
-
+  val hocrFileName = "../data/luxmundi302.html"
+  val imageFileName = "../data/luxmundi.jpeg"
+  val source = Source.fromFile(hocrFileName)
+  val reader = new XMLEventReader(source)
+  val pages = TessReader.parsePage(reader, new File(imageFileName).toURI)
   def transform(in: NodeSeq): NodeSeq = {
     <img src={"/cached?url=http://localhost:8080/static/images/luxmundi.png&rw=510"}/>
-    <p>{System.getProperty("user.dir")}</p>
   }
 }
 
