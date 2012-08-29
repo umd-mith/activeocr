@@ -99,7 +99,7 @@ case class Page(children: IndexedSeq[Zone], uri: String, imageW: Int, imageH: In
     <svg version="1.1"
       xmlns="http://www.w3.org/2000/svg"
       xmlns:xlink= "http://www.w3.org/1999/xlink"
-      width={imageW.toString} height={imageH.toString}
+      width="100%" height="100%"
       viewBox={"0 0 %d %d".format(imageW, imageH)}>
       <image xlink:href={uri}
         width={imageW.toString} height={imageH.toString}/>

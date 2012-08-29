@@ -40,7 +40,10 @@ class ActiveOCR {
   val reader = new XMLEventReader(source)
   val pages = TessReader.parsePage(reader, new File(imageFileName).toURI)
   def transform(in: NodeSeq): NodeSeq = {
-    <img src={"/cached?url=http://localhost:8080/static/images/luxmundi.png&rw=510"}/>
+    <img src={"/cached?url=http://localhost:8080/static/images/luxmundi.jpeg&rw=510"}/>
+    <div>
+      {for (page <- pages) yield <div>{page.toSVG}</div>}
+    </div>
   }
 }
 
