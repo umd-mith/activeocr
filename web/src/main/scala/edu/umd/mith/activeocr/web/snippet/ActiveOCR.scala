@@ -42,7 +42,7 @@ class ActiveOCR {
   def transform(in: NodeSeq): NodeSeq = {
     <img src={"/cached?url=http://localhost:8080/static/images/luxmundi.jpeg&rw=510"}/>
     <div>
-      {for (page <- pages) yield <div>{page.toSVG}</div>}
+      {for (page <- pages) yield <div>{page.toSVG("http://localhost:8080/static/images/luxmundi.jpeg")}</div>}
     </div>
   }
 }

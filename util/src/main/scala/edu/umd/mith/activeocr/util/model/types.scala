@@ -95,7 +95,9 @@ case class Page(children: IndexedSeq[Zone], uri: String, imageW: Int, imageH: In
   def replaceLast(f: Zone => Zone) = 
     this.copy(children = this.children.init :+ f(this.children.last))
 
-  override def toSVG =
+  override def toSVG = toSVG(uri)
+
+  def toSVG(uri: String) =
     <svg version="1.1"
       xmlns="http://www.w3.org/2000/svg"
       xmlns:xlink= "http://www.w3.org/1999/xlink"
