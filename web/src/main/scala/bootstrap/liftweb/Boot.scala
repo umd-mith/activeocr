@@ -57,7 +57,10 @@ class Boot {
     // Build SiteMap
     def sitemap() = SiteMap(
       Menu("Home") / "index" >> User.AddUserMenusAfter, // Simple menu form
-      Menu("ActiveOCR") / "activeocr" >> User.AddUserMenusAfter,
+      Menu("Active OCR") / "activeocr" >> User.AddUserMenusAfter,
+      Menu("Active OCR Step 1") / "activeocr1" >> User.AddUserMenusAfter,
+      Menu("Active OCR Step 2") / "activeocr2" >> User.AddUserMenusAfter,
+      Menu("Active OCR Step 3") / "activeocr3" >> User.AddUserMenusAfter,
       // Menu with special Link
       Menu(Loc("Static", Link(List("static"), true, "/static/index"), 
 	       "Static Content")))

@@ -33,13 +33,21 @@ import javax.imageio.ImageIO
 import scala.io.Source
 import scala.xml.pull.XMLEventReader
 
+import org.imgscalr.Scalr._
+
 class ActiveOCR {
   val hocrFileName = "../data/luxmundi302.html"
   val imageFileName = "../data/luxmundi.jpeg"
   val source = Source.fromFile(hocrFileName)
   val reader = new XMLEventReader(source)
   val pages = TessReader.parsePage(reader, new File(imageFileName).toURI)
+
+  var img = ImageIO.read(new File(imageFileName))
+  var tmpImg = crop(img, 138, 345, 88, 22)
+  ImageIO.write(tmpImg, "jpeg", new File("./src/main/webapp/images/tmp.jpeg"))
+
   def transform(in: NodeSeq): NodeSeq = {
+    <img src="images/tmp.jpeg"/>
     <img src={"/cached?url=http://localhost:8080/static/images/luxmundi.jpeg&rw=510"}/>
     <div>
       {for (page <- pages) yield <div>{page.toSVG("http://localhost:8080/static/images/luxmundi.jpeg")}</div>}
