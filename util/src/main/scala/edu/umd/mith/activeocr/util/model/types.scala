@@ -34,8 +34,10 @@ trait Bbox {
       color.map("stroke: %s; ".format(_)).getOrElse("")
     )} x={this.x.toString} y={this.y.toString}
     width={this.w.toString} height={this.h.toString}/>
-  def listify =
-    println(this)
+  
+  // def listify = println(this)
+  // def bbList: List[Bbox] = List(this)
+  def bbList: IndexedSeq[Bbox] = IndexedSeq(this)
 }
 
 trait Container[A <: Bbox, B <: Container[A, B]] extends Bbox {
@@ -53,7 +55,10 @@ trait Container[A <: Bbox, B <: Container[A, B]] extends Bbox {
   def replaceLast(f: A => A): B
 
   override def toSVG = super.toSVG ++ this.children.flatMap(_.toSVG)
-  override def listify = this.children.map(_.listify)
+  
+  // override def listify = this.children.foreach(_.listify)
+  // override def bbList: List[Bbox] = this.children.flatMap(_.bbList) (collection.breakOut)
+  override def bbList: IndexedSeq[Bbox] = this.children.flatMap(_.bbList)
 }
 
 trait Word extends Bbox { override val color = Some("green") }

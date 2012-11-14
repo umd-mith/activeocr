@@ -1,7 +1,14 @@
+.settings
 target/
 tmp/
+util/.classpath
+util/.project
+util/.settings
 util/target/
 util/tmp/
+web/.classpath
+web/.project
+web/.settings
 web/target/
 web/tmp/
 tmp.jpeg

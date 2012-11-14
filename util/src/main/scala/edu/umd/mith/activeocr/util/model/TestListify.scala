@@ -32,9 +32,12 @@ object TestListify {
     val formatter = new scala.xml.PrettyPrinter(80, 2)
     val printer = new java.io.PrintWriter("luxmundi302.svg")
     val pages = TessReader.parsePage(reader, this.getClass.getResource("/luxmundi.jpeg").toURI)
-    for (page <- pages)
-      page.listify
-    printer.close()
+    for (page <- pages) {
+      val nodes = page.bbList
+      for (node <- nodes)
+        println(node)
+    }
+  printer.close()
   }
 }
 
