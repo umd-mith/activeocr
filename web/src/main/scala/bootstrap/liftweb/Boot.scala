@@ -57,7 +57,7 @@ class Boot {
     // Build SiteMap
     def sitemap() = SiteMap(
       Menu("Home") / "index" >> User.AddUserMenusAfter, // Simple menu form
-      Menu("Active OCR") / "activeocr" >> User.AddUserMenusAfter,
+      Menu("Active OCR Step 0") / "activeocr0" >> User.AddUserMenusAfter,     
       Menu("Active OCR Step 1") / "activeocr1" >> User.AddUserMenusAfter,
       Menu("Active OCR Step 2") / "activeocr2" >> User.AddUserMenusAfter,
       Menu("Active OCR Step 3") / "activeocr3" >> User.AddUserMenusAfter,

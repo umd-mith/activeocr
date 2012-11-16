@@ -1,6 +1,6 @@
 /*
  * #%L
- * Active OCR Utilities
+ * Active OCR Web Application
  * %%
  * Copyright (C) 2011 - 2012 Maryland Institute for Technology in the Humanities
  * %%
@@ -17,23 +17,29 @@
  * limitations under the License.
  * #L%
  */
-package edu.umd.mith.activeocr.util.model
+package edu.umd.mith.activeocr.web {
+package snippet {
 
-import scala.io._
-import scala.xml.pull._
+import _root_.scala.xml.{NodeSeq, Text}
+import _root_.net.liftweb.util._
+import _root_.net.liftweb.common._
+import edu.umd.mith.activeocr.web.lib._
+import Helpers._
 
-object TestListify {
-  def main(args: Array[String]): Unit = {
-    val filename = "/luxmundi302.html"
-    val source = Source.fromInputStream(getClass.getResourceAsStream(filename))
-    val reader = new XMLEventReader(source)
-    val pages = TessReader.parsePage(reader, this.getClass.getResource("/luxmundi.jpeg").toURI)
-    for (page <- pages) {
-      // page.listify
-      val nodes = page.bbList
-      for (node <- nodes)
-        println(node)
-    }
+import java.io.File
+import javax.imageio.ImageIO
+import org.imgscalr.Scalr._
+
+class ActiveOcrStep2 {
+  val imageFileName = "../data/luxmundi.jpeg"
+  var img = ImageIO.read(new File(imageFileName))
+  var tmpImg = crop(img, 138, 345, 88, 22)
+  ImageIO.write(tmpImg, "jpeg", new File("./src/main/webapp/images/tmp.jpeg"))
+
+  def transform(in: NodeSeq): NodeSeq = {
+    <img src="images/tmp.jpeg"/>  
   }
 }
 
+}
+}
