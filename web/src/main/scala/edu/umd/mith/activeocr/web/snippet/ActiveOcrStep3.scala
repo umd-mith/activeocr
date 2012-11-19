@@ -23,35 +23,42 @@ package snippet {
 import _root_.scala.xml.{NodeSeq, Text}
 import _root_.net.liftweb.util._
 import _root_.net.liftweb.common._
-import _root_.java.util.Date
 import edu.umd.mith.activeocr.web.lib._
 import Helpers._
 
-import edu.umd.mith.activeocr.util.model._
 import java.io.File
 import javax.imageio.ImageIO
+import org.imgscalr.Scalr._
+
 import scala.io.Source
 import scala.xml.pull.XMLEventReader
-
-import org.imgscalr.Scalr._
+import edu.umd.mith.activeocr.util.model._
 
 class ActiveOcrStep3 {
   val hocrFileName = "../data/luxmundi302.html"
-  val imageFileName = "../data/luxmundi.jpeg"
   val source = Source.fromFile(hocrFileName)
   val reader = new XMLEventReader(source)
+  val imageFileName = "../data/luxmundi.jpeg"
   val pages = TessReader.parsePage(reader, new File(imageFileName).toURI)
-
-  var img = ImageIO.read(new File(imageFileName))
-  var tmpImg = crop(img, 138, 345, 88, 22)
-  ImageIO.write(tmpImg, "jpeg", new File("./src/main/webapp/images/tmp.jpeg"))
+  val img = ImageIO.read(new File(imageFileName))
+  val tmpDir = new File("./src/main/webapp/images/tmp")
+  
+  for (page <- pages) {
+    val nodes = page.bbList
+    for (node <- nodes) {
+      node match {
+        case t@TermWord(s, x, y, w, h) =>
+          var tmpImg = crop(img, x, y, w, h)
+          ImageIO.write(tmpImg, "jpeg", new File("./src/main/webapp/images/tmp.jpeg"))
+          ImageIO.write(tmpImg, "jpeg", java.io.File.createTempFile("tmp", ".jpeg", tmpDir))
+        case g@Glyph(c, x, y, w, h) => () // do nothing
+        case _ => () // do nothing
+      }
+    }
+  }
 
   def transform(in: NodeSeq): NodeSeq = {
-    <img src="images/tmp.jpeg"/>
-    <img src={"/cached?url=http://localhost:8080/static/images/luxmundi.jpeg&rw=510"}/>
-    <div>
-      {for (page <- pages) yield <div>{page.toSVG("http://localhost:8080/static/images/luxmundi.jpeg")}</div>}
-    </div>
+    <img src="images/tmp.jpeg"/>  
   }
 }
 
