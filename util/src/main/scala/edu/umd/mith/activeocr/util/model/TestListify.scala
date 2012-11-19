@@ -29,10 +29,14 @@ object TestListify {
     val reader = new XMLEventReader(source)
     val pages = TessReader.parsePage(reader, this.getClass.getResource("/luxmundi.jpeg").toURI)
     for (page <- pages) {
-      // page.listify
       val nodes = page.bbList
-      for (node <- nodes)
-        println(node)
+      for (node <- nodes) {
+        node match {
+          case t@TermWord(s, x, y, w, h) => println(s + " " + x + " " + t)
+          case g@Glyph(c, x, y, w, h) => println(c + " " + x + " " + g)
+          case _ => () // do nothing
+        }
+      }
     }
   }
 }
