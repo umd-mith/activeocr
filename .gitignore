@@ -2,6 +2,7 @@
 .settings
 target/
 tmp/
+!web/src/main/webapp/images/tmp
 util/.classpath
 util/.project
 util/.settings
