@@ -43,7 +43,7 @@ class ActiveOcrStep3 extends StatefulSnippet {
   val pages = TessReader.parsePage(reader, new File(imageFileName).toURI)
   val img = ImageIO.read(new File(imageFileName))
   val count = S.param("count").openOr("0").toInt
-  if (count == 0) S.redirectTo("/activeocr3?count=7")
+  if (count < 0) S.redirectTo("/activeocr3?count=0")
   val nextCount = (count + 1).toString
   val nextString = "activeocr3?count=" + nextCount
   val prevCount = (count - 1).toString
@@ -52,11 +52,15 @@ class ActiveOcrStep3 extends StatefulSnippet {
     val nodes = page.bbList
     nodes(count) match {
       case t@TermWord(s, x, y, w, h) =>
-        var tmpImg = crop(img, x, y, w, h)
-        ImageIO.write(tmpImg, "jpeg", new File("./src/main/webapp/images/tmp.jpeg"))
+        if ((w > 0) && (h > 0)) {
+          var tmpImg = crop(img, x, y, w, h)
+          ImageIO.write(tmpImg, "jpeg", new File("./src/main/webapp/images/tmp.jpeg"))
+        }
       case g@Glyph(c, x, y, w, h) =>
-        var tmpImg = crop(img, x, y, w, h)
-        ImageIO.write(tmpImg, "jpeg", new File("./src/main/webapp/images/tmp.jpeg"))
+        if ((w > 0) && (h > 0)) {
+          var tmpImg = crop(img, x, y, w, h)
+          ImageIO.write(tmpImg, "jpeg", new File("./src/main/webapp/images/tmp.jpeg"))
+        }
       case _ => () // do nothing
     }
   }
