@@ -23,6 +23,7 @@ package snippet {
 import _root_.scala.xml.{NodeSeq, Text}
 import _root_.net.liftweb.util._
 import _root_.net.liftweb.common._
+import _root_.net.liftweb.http._
 import edu.umd.mith.activeocr.web.lib._
 import Helpers._
 
@@ -34,31 +35,43 @@ import scala.io.Source
 import scala.xml.pull.XMLEventReader
 import edu.umd.mith.activeocr.util.model._
 
-class ActiveOcrStep3 {
+class ActiveOcrStep3 extends StatefulSnippet {
   val hocrFileName = "../data/luxmundi302.html"
   val source = Source.fromFile(hocrFileName)
   val reader = new XMLEventReader(source)
   val imageFileName = "../data/luxmundi.jpeg"
   val pages = TessReader.parsePage(reader, new File(imageFileName).toURI)
   val img = ImageIO.read(new File(imageFileName))
-  val tmpDir = new File("./src/main/webapp/images/tmp")
-  
+  val count = S.param("count").openOr("0").toInt
+  if (count == 0) S.redirectTo("/activeocr3?count=7")
+  val nextCount = (count + 1).toString
+  val nextString = "activeocr3?count=" + nextCount
+  val prevCount = (count - 1).toString
+  val prevString = "activeocr3?count=" + prevCount
   for (page <- pages) {
     val nodes = page.bbList
-    for (node <- nodes) {
-      node match {
-        case t@TermWord(s, x, y, w, h) =>
-          var tmpImg = crop(img, x, y, w, h)
-          ImageIO.write(tmpImg, "jpeg", new File("./src/main/webapp/images/tmp.jpeg"))
-          ImageIO.write(tmpImg, "jpeg", java.io.File.createTempFile("tmp", ".jpeg", tmpDir))
-        case g@Glyph(c, x, y, w, h) => () // do nothing
-        case _ => () // do nothing
-      }
+    nodes(count) match {
+      case t@TermWord(s, x, y, w, h) =>
+        var tmpImg = crop(img, x, y, w, h)
+        ImageIO.write(tmpImg, "jpeg", new File("./src/main/webapp/images/tmp.jpeg"))
+      case g@Glyph(c, x, y, w, h) =>
+        var tmpImg = crop(img, x, y, w, h)
+        ImageIO.write(tmpImg, "jpeg", new File("./src/main/webapp/images/tmp.jpeg"))
+      case _ => () // do nothing
     }
   }
+  def dispatch = {
+    case "transform" => xform
+  }
 
-  def transform(in: NodeSeq): NodeSeq = {
-    <img src="images/tmp.jpeg"/>  
+  def xform(in: NodeSeq): NodeSeq = {
+    <table>
+    <tr>
+    <td><a href={prevString}>Prev</a></td>
+    <td><img src="images/tmp.jpeg"/></td>
+    <td><a href={nextString}>Next</a></td>
+    </tr>
+    </table>
   }
 }
 
