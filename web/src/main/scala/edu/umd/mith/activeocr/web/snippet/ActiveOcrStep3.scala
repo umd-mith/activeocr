@@ -43,13 +43,16 @@ class ActiveOcrStep3 extends StatefulSnippet {
   val pages = TessReader.parsePage(reader, new File(imageFileName).toURI)
   val img = ImageIO.read(new File(imageFileName))
   val count = S.param("count").openOr("0").toInt
-  if (count < 0) S.redirectTo("/activeocr3?count=0")
+  val firstString = "/activeocr3?count=0"
+  var lastString = ""
+  if (count < 0) S.redirectTo(firstString)
   val nextCount = (count + 1).toString
   val nextString = "activeocr3?count=" + nextCount
   val prevCount = (count - 1).toString
   val prevString = "activeocr3?count=" + prevCount
   for (page <- pages) {
     val nodes = page.bbList
+    lastString = "activeocr3?count=" + (nodes.length - 1)
     nodes(count) match {
       case t@TermWord(s, x, y, w, h) =>
         if ((w > 0) && (h > 0)) {
@@ -71,9 +74,11 @@ class ActiveOcrStep3 extends StatefulSnippet {
   def xform(in: NodeSeq): NodeSeq = {
     <table>
     <tr>
-    <td><a href={prevString}>Prev</a></td>
+    <td><a href={firstString}>&lt;&lt; First</a></td>
+    <td><a href={prevString}>&lt; Prev</a></td>
     <td><img src="images/tmp.jpeg"/></td>
-    <td><a href={nextString}>Next</a></td>
+    <td><a href={nextString}>Next &gt;</a></td>
+    <td><a href={lastString}>Last &gt;&gt;</a></td>
     </tr>
     </table>
   }
