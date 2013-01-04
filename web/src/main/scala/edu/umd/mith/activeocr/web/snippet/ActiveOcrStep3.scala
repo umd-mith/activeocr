@@ -59,7 +59,8 @@ class ActiveOcrStep3 extends StatefulSnippet {
     lastString = "activeocr3?count=" + lastCount.toString
     nextCount = if (count < lastCount) count + 1 else lastCount
     nextString = "activeocr3?count=" + nextCount.toString
-    nodes(count) match {
+    val thisCount = if (count < 0) 0 else if (count > lastCount) lastCount else count
+    nodes(thisCount) match {
       case t@TermWord(s, x, y, w, h) =>
         if ((w > 0) && (h > 0)) {
           var tmpImg = crop(img, x, y, w, h)
