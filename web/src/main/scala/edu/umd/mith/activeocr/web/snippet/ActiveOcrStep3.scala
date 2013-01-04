@@ -43,16 +43,22 @@ class ActiveOcrStep3 extends StatefulSnippet {
   val pages = TessReader.parsePage(reader, new File(imageFileName).toURI)
   val img = ImageIO.read(new File(imageFileName))
   val count = S.param("count").openOr("0").toInt
+  // if (count < 0) S.redirectTo("/activeocr3?count=0")
+  // enough information to declare and initialize first, prev
   val firstString = "/activeocr3?count=0"
+  val prevCount = if (count > 0) count - 1 else 0
+  val prevString = "activeocr3?count=" + prevCount.toString
+  // not enough information to initialize last, next
   var lastString = ""
-  if (count < 0) S.redirectTo(firstString)
-  val nextCount = (count + 1).toString
-  val nextString = "activeocr3?count=" + nextCount
-  val prevCount = (count - 1).toString
-  val prevString = "activeocr3?count=" + prevCount
+  var nextCount = 0
+  var nextString = ""
   for (page <- pages) {
     val nodes = page.bbList
-    lastString = "activeocr3?count=" + (nodes.length - 1)
+    // enough information to initialize last, next
+    val lastCount = nodes.length - 1
+    lastString = "activeocr3?count=" + lastCount.toString
+    nextCount = if (count < lastCount) count + 1 else lastCount
+    nextString = "activeocr3?count=" + nextCount.toString
     nodes(count) match {
       case t@TermWord(s, x, y, w, h) =>
         if ((w > 0) && (h > 0)) {
