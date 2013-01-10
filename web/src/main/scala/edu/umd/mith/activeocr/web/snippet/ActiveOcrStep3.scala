@@ -52,6 +52,7 @@ class ActiveOcrStep3 extends StatefulSnippet {
   var lastString = ""
   var nextCount = 0
   var nextString = ""
+  var ocrText = ""
   for (page <- pages) {
     val nodes = page.bbList
     // enough information to initialize last, next
@@ -63,11 +64,13 @@ class ActiveOcrStep3 extends StatefulSnippet {
     nodes(thisCount) match {
       case t@TermWord(s, x, y, w, h) =>
         if ((w > 0) && (h > 0)) {
+          ocrText = s
           var tmpImg = crop(img, x, y, w, h)
           ImageIO.write(tmpImg, "jpeg", new File("./src/main/webapp/images/tmp.jpeg"))
         }
       case g@Glyph(c, x, y, w, h) =>
         if ((w > 0) && (h > 0)) {
+          ocrText = c
           var tmpImg = crop(img, x, y, w, h)
           ImageIO.write(tmpImg, "jpeg", new File("./src/main/webapp/images/tmp.jpeg"))
         }
@@ -86,6 +89,13 @@ class ActiveOcrStep3 extends StatefulSnippet {
     <td><img src="images/tmp.jpeg"/></td>
     <td><a href={nextString}>Next &gt;</a></td>
     <td><a href={lastString}>Last &gt;&gt;</a></td>
+    </tr>
+    <tr>
+    <td></td>
+    <td></td>
+    <td>{ocrText}</td>
+    <td></td>
+    <td></td>
     </tr>
     </table>
   }
