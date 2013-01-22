@@ -23,6 +23,7 @@ package snippet {
 import _root_.scala.xml.{NodeSeq, Text}
 import _root_.net.liftweb.util._
 import _root_.net.liftweb.common._
+import _root_.net.liftweb.http._
 import edu.umd.mith.activeocr.web.lib._
 import Helpers._
 
@@ -30,14 +31,73 @@ import java.io.File
 import javax.imageio.ImageIO
 import org.imgscalr.Scalr._
 
-class ActiveOcrStep2 {
-  val imageFileName = "../data/luxmundi.jpeg"
-  var img = ImageIO.read(new File(imageFileName))
-  var tmpImg = crop(img, 138, 345, 88, 22)
-  ImageIO.write(tmpImg, "jpeg", new File("./src/main/webapp/images/tmp.jpeg"))
+import scala.io.Source
+import scala.xml.pull.XMLEventReader
+import edu.umd.mith.activeocr.util.model._
 
-  def transform(in: NodeSeq): NodeSeq = {
-    <img src="images/tmp.jpeg"/>  
+class ActiveOcrStep2 extends StatefulSnippet {
+  val hocrFileName = "../data/luxmundi302.html"
+  val source = Source.fromFile(hocrFileName)
+  val reader = new XMLEventReader(source)
+  val imageFileName = "../data/luxmundi.jpeg"
+  val pages = TessReader.parsePage(reader, new File(imageFileName).toURI)
+  val img = ImageIO.read(new File(imageFileName))
+  val count = S.param("count").openOr("0").toInt
+  // if (count < 0) S.redirectTo("/activeocr2?count=0")
+  // enough information to declare and initialize first, prev
+  val firstString = "/activeocr2?count=0"
+  val prevCount = if (count > 0) count - 1 else 0
+  val prevString = "activeocr2?count=" + prevCount.toString
+  // not enough information to initialize last, next
+  var lastString = ""
+  var nextCount = 0
+  var nextString = ""
+  var ocrText = ""
+  for (page <- pages) {
+    val nodes = page.bbList
+    // enough information to initialize last, next
+    val lastCount = nodes.length - 1
+    lastString = "activeocr2?count=" + lastCount.toString
+    nextCount = if (count < lastCount) count + 1 else lastCount
+    nextString = "activeocr2?count=" + nextCount.toString
+    val thisCount = if (count < 0) 0 else if (count > lastCount) lastCount else count
+    nodes(thisCount) match {
+      case t@TermWord(s, x, y, w, h) =>
+        if ((w > 0) && (h > 0)) {
+          ocrText = s
+          var tmpImg = crop(img, x, y, w, h)
+          ImageIO.write(tmpImg, "jpeg", new File("./src/main/webapp/images/tmp.jpeg"))
+        }
+      case g@Glyph(c, x, y, w, h) =>
+        if ((w > 0) && (h > 0)) {
+          ocrText = c
+          var tmpImg = crop(img, x, y, w, h)
+          ImageIO.write(tmpImg, "jpeg", new File("./src/main/webapp/images/tmp.jpeg"))
+        }
+      case _ => () // do nothing
+    }
+  }
+  def dispatch = {
+    case "transform" => xform
+  }
+
+  def xform(in: NodeSeq): NodeSeq = {
+    <table>
+    <tr>
+    <td><a href={firstString}>&lt;&lt; First</a></td>
+    <td><a href={prevString}>&lt; Prev</a></td>
+    <td><img src="images/tmp.jpeg"/></td>
+    <td><a href={nextString}>Next &gt;</a></td>
+    <td><a href={lastString}>Last &gt;&gt;</a></td>
+    </tr>
+    <tr>
+    <td></td>
+    <td></td>
+    <td>{ocrText}</td>
+    <td></td>
+    <td></td>
+    </tr>
+    </table>
   }
 }
 

@@ -42,6 +42,7 @@ class ActiveOcrStep3 extends StatefulSnippet {
   val imageFileName = "../data/luxmundi.jpeg"
   val pages = TessReader.parsePage(reader, new File(imageFileName).toURI)
   val img = ImageIO.read(new File(imageFileName))
+  val ocrCorrection = S.param("correction").openOr("")
   val count = S.param("count").openOr("0").toInt
   // if (count < 0) S.redirectTo("/activeocr3?count=0")
   // enough information to declare and initialize first, prev
@@ -63,12 +64,14 @@ class ActiveOcrStep3 extends StatefulSnippet {
     val thisCount = if (count < 0) 0 else if (count > lastCount) lastCount else count
     nodes(thisCount) match {
       case t@TermWord(s, x, y, w, h) =>
+        if (ocrCorrection != "") t.s = ocrCorrection
         if ((w > 0) && (h > 0)) {
           ocrText = s
           var tmpImg = crop(img, x, y, w, h)
           ImageIO.write(tmpImg, "jpeg", new File("./src/main/webapp/images/tmp.jpeg"))
         }
       case g@Glyph(c, x, y, w, h) =>
+        if (ocrCorrection != "") g.c = ocrCorrection
         if ((w > 0) && (h > 0)) {
           ocrText = c
           var tmpImg = crop(img, x, y, w, h)
@@ -92,7 +95,7 @@ class ActiveOcrStep3 extends StatefulSnippet {
     </tr>
     <tr>
     <td></td>
-    <td></td>
+    <td>{ocrCorrection}</td>
     <td>{ocrText}</td>
     <td></td>
     <td></td>

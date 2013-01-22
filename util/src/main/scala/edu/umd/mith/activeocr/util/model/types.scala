@@ -65,11 +65,11 @@ trait Word extends Bbox { override val color = Some("green") }
 
 trait Line extends Bbox { override val color = Some("blue") }
 
-case class Glyph(c: String, x: Int, y: Int, w: Int, h: Int) extends Bbox {
+case class Glyph(var c: String, x: Int, y: Int, w: Int, h: Int) extends Bbox {
   override val color = Some("orange")
 }
 
-case class TermWord(s: String, x: Int, y: Int, w: Int, h: Int) extends Word
+case class TermWord(var s: String, x: Int, y: Int, w: Int, h: Int) extends Word
 
 case class ContWord(children: IndexedSeq[Glyph]) 
     extends Container[Glyph, ContWord] with Word {
