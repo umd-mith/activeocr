@@ -54,8 +54,9 @@ class ActiveOcrStep3 extends StatefulSnippet {
   var nextCount = 0
   var nextString = ""
   var ocrText = ""
+  var nodes = IndexedSeq.empty[Bbox]
   for (page <- pages) {
-    val nodes = page.bbList
+    nodes = page.bbList
     // enough information to initialize last, next
     val lastCount = nodes.length - 1
     lastString = "activeocr3?count=" + lastCount.toString
@@ -85,6 +86,7 @@ class ActiveOcrStep3 extends StatefulSnippet {
   }
 
   def xform(in: NodeSeq): NodeSeq = {
+    <form>
     <table>
     <tr>
     <td><a href={firstString}>&lt;&lt; First</a></td>
@@ -97,10 +99,11 @@ class ActiveOcrStep3 extends StatefulSnippet {
     <td></td>
     <td>{ocrCorrection}</td>
     <td>{ocrText}</td>
-    <td></td>
-    <td></td>
+    <td><input type="text" name="correction" size="3"/></td>
+    <td><input type="submit" value="Submit"/></td>
     </tr>
     </table>
+    </form>
   }
 }
 
