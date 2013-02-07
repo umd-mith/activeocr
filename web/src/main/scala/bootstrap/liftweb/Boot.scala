@@ -61,6 +61,7 @@ class Boot {
       Menu("Active OCR Step 1") / "activeocr1" >> User.AddUserMenusAfter,
       Menu("Active OCR Step 2") / "activeocr2" >> User.AddUserMenusAfter,
       Menu("Active OCR Step 3") / "activeocr3" >> User.AddUserMenusAfter,
+      Menu("Active OCR Step 4") / "activeocr4" >> User.AddUserMenusAfter,      
       // Menu with special Link
       Menu(Loc("Static", Link(List("static"), true, "/static/index"), 
 	       "Static Content")))
