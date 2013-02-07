@@ -35,6 +35,10 @@ import scala.io.Source
 import scala.xml.pull.XMLEventReader
 import edu.umd.mith.activeocr.util.model._
 
+// object nodesVar extends SessionVar[IndexedSeq[Bbox]](IndexedSeq[Bbox]()) // This works!!!
+// object nodesVar extends SessionVar[IndexedSeq[Bbox]](IndexedSeq.empty[Bbox]) // This works!!!
+// object nodesVar extends SessionVar[Box[IndexedSeq[Bbox]]](Empty) // This works!!!
+
 class ActiveOcrStep3 extends StatefulSnippet {
   val hocrFileName = "../data/luxmundi302.html"
   val source = Source.fromFile(hocrFileName)
