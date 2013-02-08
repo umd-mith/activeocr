@@ -39,6 +39,9 @@ import edu.umd.mith.activeocr.util.model._
 // object nodesVar extends SessionVar[IndexedSeq[Bbox]](IndexedSeq.empty[Bbox]) // This works!!!
 // object nodesVar extends SessionVar[Box[IndexedSeq[Bbox]]](Empty) // This works!!!
 
+object countVar extends SessionVar[Int](S.param("count").map(_.toInt).openOr(0))
+object correctionVar extends SessionVar[String](S.param("correction").openOr(""))
+
 class ActiveOcrStep4 extends StatefulSnippet {
   val hocrFileName = "../data/luxmundi302.html"
   val source = Source.fromFile(hocrFileName)
@@ -46,8 +49,8 @@ class ActiveOcrStep4 extends StatefulSnippet {
   val imageFileName = "../data/luxmundi.jpeg"
   val pages = TessReader.parsePage(reader, new File(imageFileName).toURI)
   val img = ImageIO.read(new File(imageFileName))
-  // val ocrCorrection = S.param("correction").openOr("")
-  val count = S.param("count").openOr("0").toInt
+  val count = countVar.is // S.param("count").map(_.toInt).openOr(0)
+  val ocrCorrection = correctionVar.is // S.param("correction").openOr("")
   // if (count < 0) S.redirectTo("/activeocr4?count=0")
   // enough information to declare and initialize first, prev
   val firstString = "/activeocr4?count=0"
@@ -69,14 +72,14 @@ class ActiveOcrStep4 extends StatefulSnippet {
     val thisCount = if (count < 0) 0 else if (count > lastCount) lastCount else count
     nodes(thisCount) match {
       case t@TermWord(s, x, y, w, h) =>
-        // if (ocrCorrection != "") t.s = ocrCorrection
+        if (ocrCorrection != "") t.s = ocrCorrection
         if ((w > 0) && (h > 0)) {
           ocrText = s
           var tmpImg = crop(img, x, y, w, h)
           ImageIO.write(tmpImg, "jpeg", new File("./src/main/webapp/images/tmp.jpeg"))
         }
       case g@Glyph(c, x, y, w, h) =>
-        // if (ocrCorrection != "") g.c = ocrCorrection
+        if (ocrCorrection != "") g.c = ocrCorrection
         if ((w > 0) && (h > 0)) {
           ocrText = c
           var tmpImg = crop(img, x, y, w, h)
@@ -95,7 +98,8 @@ class ActiveOcrStep4 extends StatefulSnippet {
       "prevString" -> <a href={prevString}>&lt; Previous</a>,
       "nextString" -> <a href={nextString}>Next &gt;</a>,
       "lastString" -> <a href={lastString}>Last &gt;&gt;</a>,
-      "ocrText" -> ocrText
+      "ocrText" -> ocrText,
+      "ocrCorrection" -> ocrCorrection
     )
   }
 }
