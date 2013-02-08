@@ -46,7 +46,7 @@ class ActiveOcrStep4 extends StatefulSnippet {
   val imageFileName = "../data/luxmundi.jpeg"
   val pages = TessReader.parsePage(reader, new File(imageFileName).toURI)
   val img = ImageIO.read(new File(imageFileName))
-  val ocrCorrection = S.param("correction").openOr("")
+  // val ocrCorrection = S.param("correction").openOr("")
   val count = S.param("count").openOr("0").toInt
   // if (count < 0) S.redirectTo("/activeocr4?count=0")
   // enough information to declare and initialize first, prev
@@ -69,14 +69,14 @@ class ActiveOcrStep4 extends StatefulSnippet {
     val thisCount = if (count < 0) 0 else if (count > lastCount) lastCount else count
     nodes(thisCount) match {
       case t@TermWord(s, x, y, w, h) =>
-        if (ocrCorrection != "") t.s = ocrCorrection
+        // if (ocrCorrection != "") t.s = ocrCorrection
         if ((w > 0) && (h > 0)) {
           ocrText = s
           var tmpImg = crop(img, x, y, w, h)
           ImageIO.write(tmpImg, "jpeg", new File("./src/main/webapp/images/tmp.jpeg"))
         }
       case g@Glyph(c, x, y, w, h) =>
-        if (ocrCorrection != "") g.c = ocrCorrection
+        // if (ocrCorrection != "") g.c = ocrCorrection
         if ((w > 0) && (h > 0)) {
           ocrText = c
           var tmpImg = crop(img, x, y, w, h)
@@ -86,28 +86,17 @@ class ActiveOcrStep4 extends StatefulSnippet {
     }
   }
   def dispatch = {
-    case "transform" => xform
+    case "render" => render
   }
 
-  def xform(in: NodeSeq): NodeSeq = {
-    <form>
-    <table>
-    <tr>
-    <td><a href={firstString}>&lt;&lt; First</a></td>
-    <td><a href={prevString}>&lt; Prev</a></td>
-    <td><img src="images/tmp.jpeg"/></td>
-    <td><a href={nextString}>Next &gt;</a></td>
-    <td><a href={lastString}>Last &gt;&gt;</a></td>
-    </tr>
-    <tr>
-    <td></td>
-    <td>{ocrCorrection}</td>
-    <td>{ocrText}</td>
-    <td><input type="text" name="correction" size="3"/></td>
-    <td><input type="submit" value="Submit"/></td>
-    </tr>
-    </table>
-    </form>
+  def render(in: NodeSeq): NodeSeq = {
+    bind ("prefix", in,
+      "firstString" -> <a href={firstString}>&lt;&lt; First</a>,
+      "prevString" -> <a href={prevString}>&lt; Previous</a>,
+      "nextString" -> <a href={nextString}>Next &gt;</a>,
+      "lastString" -> <a href={lastString}>Last &gt;&gt;</a>,
+      "ocrText" -> ocrText
+    )
   }
 }
 
