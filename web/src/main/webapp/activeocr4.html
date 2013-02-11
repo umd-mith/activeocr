@@ -18,7 +18,7 @@
   #L%
   -->
 <lift:surround with="default" at="content">
-  <lift:ActiveOcrStep4.render>
+  <lift:ActiveOcrStep4.render form="POST">
     <h2>Active OCR Step 4</h2>
     <table>
       <tr>
@@ -32,8 +32,8 @@
         <td></td>
         <td><prefix:ocrCorrection/></td>
         <td><prefix:ocrText/></td>
-        <td></td>
-        <td></td>
+        <td><prefix:correction/></td>
+        <td><prefix:perform/></td>
       </tr>
     </table>
   </lift:ActiveOcrStep4.render>

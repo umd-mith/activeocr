@@ -50,7 +50,7 @@ class ActiveOcrStep4 extends StatefulSnippet {
   val pages = TessReader.parsePage(reader, new File(imageFileName).toURI)
   val img = ImageIO.read(new File(imageFileName))
   val count = countVar.is // S.param("count").map(_.toInt).openOr(0)
-  val ocrCorrection = correctionVar.is // S.param("correction").openOr("")
+  var ocrCorrection = correctionVar.is // S.param("correction").openOr("")
   // if (count < 0) S.redirectTo("/activeocr4?count=0")
   // enough information to declare and initialize first, prev
   val firstString = "/activeocr4?count=0"
@@ -99,8 +99,15 @@ class ActiveOcrStep4 extends StatefulSnippet {
       "nextString" -> <a href={nextString}>Next &gt;</a>,
       "lastString" -> <a href={lastString}>Last &gt;&gt;</a>,
       "ocrText" -> ocrText,
-      "ocrCorrection" -> ocrCorrection
+      "ocrCorrection" -> ocrCorrection,
+      //
+      "correction" -> SHtml.text(ocrCorrection, ocrCorrection = _),
+      "perform" -> SHtml.submit("Submit", () => perform(ocrCorrection))
     )
+  }
+
+  def perform(correction: String): Unit = {
+    correctionVar(correction)
   }
 }
 
