@@ -74,20 +74,21 @@ class ActiveOcrStep4 extends StatefulSnippet {
       case t@TermWord(s, x, y, w, h) =>
         if (ocrCorrection != "") t.s = ocrCorrection
         if ((w > 0) && (h > 0)) {
-          ocrText = s
+          ocrText = t.s
           var tmpImg = crop(img, x, y, w, h)
           ImageIO.write(tmpImg, "jpeg", new File("./src/main/webapp/images/tmp.jpeg"))
         }
       case g@Glyph(c, x, y, w, h) =>
         if (ocrCorrection != "") g.c = ocrCorrection
         if ((w > 0) && (h > 0)) {
-          ocrText = c
+          ocrText = g.c
           var tmpImg = crop(img, x, y, w, h)
           ImageIO.write(tmpImg, "jpeg", new File("./src/main/webapp/images/tmp.jpeg"))
         }
       case _ => () // do nothing
     }
   }
+
   def dispatch = {
     case "render" => render
   }
@@ -101,7 +102,7 @@ class ActiveOcrStep4 extends StatefulSnippet {
       "ocrText" -> ocrText,
       "ocrCorrection" -> ocrCorrection,
       //
-      "correction" -> SHtml.text(ocrCorrection, ocrCorrection = _),
+      "correction" -> SHtml.text(ocrCorrection, {s: String => ocrText = s; ocrCorrection = s}),
       "perform" -> SHtml.submit("Submit", () => perform(ocrCorrection))
     )
   }
