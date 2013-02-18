@@ -36,7 +36,7 @@ import scala.xml.pull.XMLEventReader
 import edu.umd.mith.activeocr.util.model._
 
 // object nodesVar extends SessionVar[IndexedSeq[Bbox]](IndexedSeq[Bbox]()) // This works!!!
-// object nodesVar extends SessionVar[IndexedSeq[Bbox]](IndexedSeq.empty[Bbox]) // This works!!!
+ object nodesVar extends SessionVar[IndexedSeq[Bbox]](IndexedSeq.empty[Bbox]) // This works!!!
 // object nodesVar extends SessionVar[Box[IndexedSeq[Bbox]]](Empty) // This works!!!
 
 // object countVar extends SessionVar[Int](S.param("count").map(_.toInt).openOr(0))
@@ -61,9 +61,13 @@ class ActiveOcrStep4 extends StatefulSnippet {
   var nextCount = 0
   var nextString = ""
   var ocrText = ""
-  var nodes = IndexedSeq.empty[Bbox]
+  //var nodes = IndexedSeq.empty[Bbox]
+  if (nodesVar.is.isEmpty) {
+    nodesVar(pages.head.bbList)
+  }
+  val nodes = nodesVar.is
   for (page <- pages) {
-    nodes = page.bbList
+    //nodes = page.bbList
     // enough information to initialize last, next
     val lastCount = nodes.length - 1
     lastString = "activeocr4?count=" + lastCount.toString
@@ -93,6 +97,17 @@ class ActiveOcrStep4 extends StatefulSnippet {
     case "render" => render
   }
 
+  def updateAt(i: Int, correction: String) = {
+    val nodes = nodesVar.is
+
+    val updatedNode = nodes(i) match {
+      case t: TermWord => t.copy(s = correction)
+      case g: Glyph => g.copy(c = correction)
+    }
+
+    nodesVar(nodes.updated(i, updatedNode))
+  }
+
   def render(in: NodeSeq): NodeSeq = {
     bind ("prefix", in,
       "firstString" -> <a href={firstString}>&lt;&lt; First</a>,
@@ -102,13 +117,13 @@ class ActiveOcrStep4 extends StatefulSnippet {
       "ocrText" -> ocrText,
       "ocrCorrection" -> ocrCorrection,
       //
-      "correction" -> SHtml.text(ocrCorrection, {s: String => ocrText = s; ocrCorrection = s}),
-      "perform" -> SHtml.submit("Submit", () => perform(ocrCorrection))
+      "correction" -> SHtml.text(ocrText, { s: String => ocrText = s }),
+      "perform" -> SHtml.submit("Submit", () => perform(ocrText))
     )
   }
 
   def perform(correction: String): Unit = {
-    correctionVar(correction)
+    updateAt(this.count, correction)
   }
 }
 
