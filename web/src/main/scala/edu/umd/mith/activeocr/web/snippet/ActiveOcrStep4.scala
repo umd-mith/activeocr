@@ -39,7 +39,7 @@ import edu.umd.mith.activeocr.util.model._
 // object nodesVar extends SessionVar[IndexedSeq[Bbox]](IndexedSeq.empty[Bbox]) // This works!!!
 // object nodesVar extends SessionVar[Box[IndexedSeq[Bbox]]](Empty) // This works!!!
 
-object countVar extends SessionVar[Int](S.param("count").map(_.toInt).openOr(0))
+// object countVar extends SessionVar[Int](S.param("count").map(_.toInt).openOr(0))
 object correctionVar extends SessionVar[String](S.param("correction").openOr(""))
 
 class ActiveOcrStep4 extends StatefulSnippet {
@@ -49,7 +49,7 @@ class ActiveOcrStep4 extends StatefulSnippet {
   val imageFileName = "../data/luxmundi.jpeg"
   val pages = TessReader.parsePage(reader, new File(imageFileName).toURI)
   val img = ImageIO.read(new File(imageFileName))
-  val count = countVar.is // S.param("count").map(_.toInt).openOr(0)
+  val count = S.param("count").map(_.toInt).openOr(0)
   var ocrCorrection = correctionVar.is // S.param("correction").openOr("")
   // if (count < 0) S.redirectTo("/activeocr4?count=0")
   // enough information to declare and initialize first, prev
