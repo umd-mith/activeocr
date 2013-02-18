@@ -35,11 +35,7 @@ import scala.io.Source
 import scala.xml.pull.XMLEventReader
 import edu.umd.mith.activeocr.util.model._
 
-// object nodesVar extends SessionVar[IndexedSeq[Bbox]](IndexedSeq[Bbox]()) // This works!!!
- object nodesVar extends SessionVar[IndexedSeq[Bbox]](IndexedSeq.empty[Bbox]) // This works!!!
-// object nodesVar extends SessionVar[Box[IndexedSeq[Bbox]]](Empty) // This works!!!
-
-// object countVar extends SessionVar[Int](S.param("count").map(_.toInt).openOr(0))
+object nodesVar extends SessionVar[IndexedSeq[Bbox]](IndexedSeq.empty[Bbox])
 object correctionVar extends SessionVar[String](S.param("correction").openOr(""))
 
 class ActiveOcrStep4 extends StatefulSnippet {
@@ -51,7 +47,6 @@ class ActiveOcrStep4 extends StatefulSnippet {
   val img = ImageIO.read(new File(imageFileName))
   val count = S.param("count").map(_.toInt).openOr(0)
   var ocrCorrection = correctionVar.is // S.param("correction").openOr("")
-  // if (count < 0) S.redirectTo("/activeocr4?count=0")
   // enough information to declare and initialize first, prev
   val firstString = "/activeocr4?count=0"
   val prevCount = if (count > 0) count - 1 else 0
@@ -61,13 +56,12 @@ class ActiveOcrStep4 extends StatefulSnippet {
   var nextCount = 0
   var nextString = ""
   var ocrText = ""
-  //var nodes = IndexedSeq.empty[Bbox]
+
   if (nodesVar.is.isEmpty) {
     nodesVar(pages.head.bbList)
   }
   val nodes = nodesVar.is
   for (page <- pages) {
-    //nodes = page.bbList
     // enough information to initialize last, next
     val lastCount = nodes.length - 1
     lastString = "activeocr4?count=" + lastCount.toString
@@ -117,7 +111,7 @@ class ActiveOcrStep4 extends StatefulSnippet {
       "ocrText" -> ocrText,
       "ocrCorrection" -> ocrCorrection,
       //
-      "correction" -> SHtml.text(ocrText, { s: String => ocrText = s }),
+      "correction" -> SHtml.text(ocrText, { s: String => ocrText = s }, "size" -> "3"),
       "perform" -> SHtml.submit("Submit", () => perform(ocrText))
     )
   }
