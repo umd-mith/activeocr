@@ -85,6 +85,9 @@ class Boot {
 
     LiftRules.dispatch.append(new ImageCache("cached" :: Nil).matcher)
 
+    LiftRules.dispatch.append(MyVendor.dispatchPF)
+    LiftRules.snippets.append(MyVendor.snippetPF)
+
     S.addAround(DB.buildLoanWrapper)
   }
 

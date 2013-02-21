@@ -44,7 +44,7 @@ class ActiveOcrStep3 extends StatefulSnippet {
   val imageFileName = "../data/luxmundi.jpeg"
   val pages = TessReader.parsePage(reader, new File(imageFileName).toURI)
   val img = ImageIO.read(new File(imageFileName))
-  val count = S.param("count").map(_.toInt).openOr(0)
+  val count = (S.param("count") map { _.toInt } openOr(0))
   // enough information to declare and initialize first, prev
   val firstString = "/activeocr3?count=0"
   val prevCount = if (count > 0) count - 1 else 0
