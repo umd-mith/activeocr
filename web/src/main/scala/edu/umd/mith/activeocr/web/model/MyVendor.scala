@@ -25,14 +25,14 @@
 package edu.umd.mith.activeocr.web {
 package model {
 
-import _root_.net.liftweb.mapper._
-import _root_.net.liftweb.util._
-import _root_.net.liftweb.common._
+import net.liftweb.mapper._
+import net.liftweb.util._
+import net.liftweb.common._
 
-import _root_.net.liftweb.openid._
+import net.liftmodules.openid._
 
-import _root_.org.openid4java.discovery.DiscoveryInformation
-import _root_.org.openid4java.message.AuthRequest
+import org.openid4java.discovery.DiscoveryInformation
+import org.openid4java.message.AuthRequest
 
 object MyVendor extends SimpleOpenIDVendor {
   def ext(di: DiscoveryInformation, authReq: AuthRequest): Unit = {

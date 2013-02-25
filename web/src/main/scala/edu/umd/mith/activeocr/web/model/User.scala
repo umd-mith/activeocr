@@ -25,11 +25,11 @@
 package edu.umd.mith.activeocr.web {
 package model {
 
-import _root_.net.liftweb.mapper._
-import _root_.net.liftweb.util._
-import _root_.net.liftweb.common._
+import net.liftweb.mapper._
+import net.liftweb.util._
+import net.liftweb.common._
 
-import _root_.net.liftweb.openid._
+import net.liftmodules.openid._
 
 object User extends User with MetaOpenIDProtoUser[User] with LongKeyedMetaMapper[User] { 
   def openIDVendor = MyVendor
