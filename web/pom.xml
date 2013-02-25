@@ -10,7 +10,7 @@
   <version>0.0.1-SNAPSHOT</version>
   
   <properties>
-    <liftweb.version>2.5-M4</liftweb.version>
+    <liftweb.version>2.5-RC1</liftweb.version>
   </properties>
 
   <parent>
@@ -34,6 +34,11 @@
       <groupId>net.liftweb</groupId>
       <artifactId>lift-mapper_2.10</artifactId>
       <version>${liftweb.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.liftmodules</groupId>
+      <artifactId>openid_2.10</artifactId>
+      <version>2.5-RC1-1.2</version>
     </dependency>
     <dependency>
       <groupId>ch.qos.logback</groupId>
