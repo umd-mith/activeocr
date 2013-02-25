@@ -29,6 +29,7 @@ import net.liftweb.mapper._
 import net.liftweb.util._
 import net.liftweb.common._
 
+import net.liftweb.http._
 import net.liftmodules.openid._
 
 object User extends User with MetaOpenIDProtoUser[User] with LongKeyedMetaMapper[User] { 
@@ -36,6 +37,20 @@ object User extends User with MetaOpenIDProtoUser[User] with LongKeyedMetaMapper
   override def screenWrap = Full(<lift:surround with="default" at="content"><lift:bind /></lift:surround>) 
   override def dbTableName = "users"
   // override def homePage = if (loggedIn_?) "/dashboard" else "/" 
+  override def loginXhtml =
+    <form method="post" action={S.uri}>
+      <table>
+        <tr>
+          <td colspan="2">{S.?("log.in")}</td>
+        </tr>
+        <tr>
+          <td>OpenID</td><td><input type="text" value="https://www.google.com/accounts/o8/id" name={openIDVendor.PostParamName}/></td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td><td><user:submit /></td>
+        </tr>
+      </table>
+    </form>
 } 
 
 class User extends LongKeyedMapper[User] with OpenIDProtoUser[User] { 
