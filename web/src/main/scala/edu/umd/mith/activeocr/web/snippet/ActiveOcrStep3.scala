@@ -20,20 +20,15 @@
 package edu.umd.mith.activeocr.web {
 package snippet {
 
-import _root_.scala.xml.{NodeSeq, Text}
-import _root_.net.liftweb.util._
-import _root_.net.liftweb.common._
-import _root_.net.liftweb.http._
-import edu.umd.mith.activeocr.web.lib._
-import Helpers._
-
+import edu.umd.mith.activeocr.util.model.{Bbox, Glyph, TermWord, TessReader}
 import java.io.File
 import javax.imageio.ImageIO
-import org.imgscalr.Scalr._
-
+import net.liftweb.http.{S, SHtml, SessionVar, StatefulSnippet}
+import net.liftweb.util.Helpers._
+import org.imgscalr.Scalr.crop
 import scala.io.Source
+import scala.xml.NodeSeq
 import scala.xml.pull.XMLEventReader
-import edu.umd.mith.activeocr.util.model._
 
 object nodesVar extends SessionVar[IndexedSeq[Bbox]](IndexedSeq.empty[Bbox])
 
