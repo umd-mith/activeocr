@@ -61,6 +61,11 @@ class Boot {
       Menu("Active OCR Step 1") / "activeocr1" >> User.AddUserMenusAfter,
       Menu("Active OCR Step 2") / "activeocr2" >> User.AddUserMenusAfter,
       Menu("Active OCR Step 3") / "activeocr3" >> User.AddUserMenusAfter,    
+      // If you don’t add a page to your SiteMap
+      // it will not be displayed by Lift on your web site.
+      // Menu items marked Hidden will not be displayed in the menu hierarchy,
+      // but the page can be accessed. 
+      Menu("User") / "user" >> Hidden,    
       // Menu with special Link
       Menu(Loc("Static", Link(List("static"), true, "/static/index"), 
 	       "Static Content")))
@@ -87,6 +92,11 @@ class Boot {
 
     LiftRules.dispatch.append(MyVendor.dispatchPF)
     LiftRules.snippets.append(MyVendor.snippetPF)
+
+    LiftRules.statelessRewrite.append {
+      case RewriteRequest(ParsePath(List("user", username),_,_,_),_,_) =>
+          RewriteResponse("user" :: Nil, Map("username" -> username))
+    }
 
     S.addAround(DB.buildLoanWrapper)
   }
