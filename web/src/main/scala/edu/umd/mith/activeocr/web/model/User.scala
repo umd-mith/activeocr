@@ -18,7 +18,7 @@
  * #L%
  */
 
-// From "Example project: Lift OpenID integration with openid-selector"
+// Adapted from "Example project: Lift OpenID integration with openid-selector"
 // Written by Tim Williams
 // https://www.assembla.com/spaces/liftweb/wiki/OpenID
 
@@ -36,7 +36,8 @@ object User extends User with MetaOpenIDProtoUser[User] with LongKeyedMetaMapper
   def openIDVendor = MyVendor
   override def screenWrap = Full(<lift:surround with="default" at="content"><lift:bind /></lift:surround>) 
   override def dbTableName = "users"
-  // override def homePage = if (loggedIn_?) "/dashboard" else "/" 
+  override def fieldOrder: List[FieldPointerType] = List(uniqueName, nickname, firstName, lastName, email, locale, timezone, password)
+  override def editFields: List[FieldPointerType] = List(uniqueName, nickname, firstName, lastName, email, locale, timezone, password)
   override def loginXhtml =
     <form method="post" action={S.uri}>
       <table>
@@ -55,6 +56,7 @@ object User extends User with MetaOpenIDProtoUser[User] with LongKeyedMetaMapper
 
 class User extends LongKeyedMapper[User] with OpenIDProtoUser[User] { 
   def getSingleton = User 
+  object uniqueName extends MappedString(this, 32)
 } 
 
 }
