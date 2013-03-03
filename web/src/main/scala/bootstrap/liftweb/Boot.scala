@@ -66,6 +66,7 @@ class Boot {
       // Menu items marked Hidden will not be displayed in the menu hierarchy,
       // but the page can be accessed. 
       Menu("User") / "user" >> Hidden,    
+      Menu("Users") / "users" >> Hidden,    
       // Menu with special Link
       Menu(Loc("Static", Link(List("static"), true, "/static/index"), 
 	       "Static Content")))
