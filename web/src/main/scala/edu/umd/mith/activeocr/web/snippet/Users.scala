@@ -20,28 +20,23 @@
 package edu.umd.mith.activeocr.web {
 package snippet {
 
-import scala.xml.{NodeSeq, Text}
 import net.liftweb.util._
-import net.liftweb.common._
-
-import net.liftweb.http.S
-
-import edu.umd.mith.activeocr.web.lib._
-import Helpers._
+import net.liftweb.util.Helpers._
+import scala.xml.NodeSeq
 
 class Users {
   val items = model.User.findAll()
   def render(in: NodeSeq): NodeSeq = {
     val tableRows = items.map(item => 
-    <tr>
-      <td>{item.uniqueName}</td>
-      <td>{item.nickname}</td>
-      <td>{item.firstName}</td>
-      <td>{item.lastName}</td>
-      <td>{item.email}</td>
-      <td>{item.locale}</td>
-      <td>{item.timezone}</td>
-    </tr>)
+      <tr>
+        <td>{item.uniqueName}</td>
+        <td>{item.nickname}</td>
+        <td>{item.firstName}</td>
+        <td>{item.lastName}</td>
+        <td>{item.email}</td>
+        <td>{item.locale}</td>
+        <td>{item.timezone}</td>
+      </tr>)
     Helpers.bind("prefix", in, "tableRows" -> tableRows)
   }
 }

@@ -20,27 +20,42 @@
 package edu.umd.mith.activeocr.web {
 package snippet {
 
-import edu.umd.mith.activeocr.web.lib._
 import edu.umd.mith.activeocr.web.model._
-import net.liftweb.common._
 import net.liftweb.http.S
-import net.liftweb.mapper._
-import net.liftweb.util.Helpers._
-import scala.xml.{NodeSeq, Text}
+import net.liftweb.mapper.By
+import scala.xml.NodeSeq
 
 class User {
   val username = S.param("username").openOr("")
-  val items = model.User.findAll(By(User.nickname, username))
+  val items = model.User.findAll(By(User.uniqueName, username))
   val response: NodeSeq = {
     if (items.length == 1) {
-      <p>{username} does matches a nickname in the database.</p>
+      <p>{username} does matches a uniqueName in the database.</p>
       <table>
-        <tr><th>nickname</th><th>firstName</th><th>lastName</th></tr>
-        {items.map(item => <tr><td>{item.nickname}</td><td>{item.firstName}</td><td>{item.lastName}</td></tr>)}
+        <tr>
+          <th>uniqueName</th>
+          <th>nickname</th>
+          <th>firstName</th>
+          <th>lastName</th>
+          <th>email</th>
+          <th>locale</th>
+          <th>timezone</th>
+        </tr>
+        {items.map(item =>
+          <tr>
+            <td>{item.uniqueName}</td>
+            <td>{item.nickname}</td>
+            <td>{item.firstName}</td>
+            <td>{item.lastName}</td>
+            <td>{item.email}</td>
+            <td>{item.locale}</td>
+            <td>{item.timezone}</td>
+          </tr>)
+        }
       </table>
     }
     else {
-      <p>{username} does not match a nickname in the database.<br/><a href="http://localhost:8080/user_mgt/login">Login</a> and Edit User.</p>
+      <p>{username} does not match a uniqueName in the database.<br/><a href="http://localhost:8080/user_mgt/login">Login</a> and Edit User.</p>
     }
   }
 
