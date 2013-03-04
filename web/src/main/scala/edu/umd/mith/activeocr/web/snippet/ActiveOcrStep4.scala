@@ -78,7 +78,8 @@ class ActiveOcrStep4 extends StatefulSnippet {
   }
 
   def dispatch = {
-    case "render" => render
+    case "renderRight" => renderRight
+    case "renderLeft" => renderLeft
   }
 
   def updateAt(i: Int, correction: String) = {
@@ -90,7 +91,7 @@ class ActiveOcrStep4 extends StatefulSnippet {
     nodesVar4(nodes.updated(i, updatedNode))
   }
 
-  def render(in: NodeSeq): NodeSeq = {
+  def renderRight(in: NodeSeq): NodeSeq = {
     bind ("prefix", in,
       "firstString" -> <a href={firstString}>&lt;&lt; First</a>,
       "prevString" -> <a href={prevString}>&lt; Previous</a>,
@@ -100,6 +101,20 @@ class ActiveOcrStep4 extends StatefulSnippet {
       "correction" -> SHtml.text(ocrText, { s: String => ocrText = s }, "size" -> "3"),
       "perform" -> SHtml.submit("Submit", () => perform(ocrText))
     )
+  }
+
+  def renderLeft(in: NodeSeq): NodeSeq = {
+    <div>
+      <svg version="1.1"
+        xmlns="http://www.w3.org/2000/svg"
+        xmlns:xlink="http://www.w3.org/1999/xlink"
+        width="100%" height="100%"
+        viewBox="0 0 680 1149">
+        <image xlink:href="http://localhost:8080/static/images/luxmundi.jpeg"
+          width="680" height="1149"/>
+        { nodes(this.count).toSVG }
+      </svg>
+    </div>
   }
 
   def perform(correction: String): Unit = {

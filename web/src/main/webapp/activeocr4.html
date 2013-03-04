@@ -18,23 +18,28 @@
   #L%
   -->
 <lift:surround with="default" at="content">
-  <lift:ActiveOcrStep4.render form="POST">
-    <h2>Active OCR Step 4</h2>
-    <table>
-      <tr>
-        <td><prefix:firstString/></td>
-        <td><prefix:prevString/></td>
-        <td><img src="images/tmp.jpeg"/></td>
-        <td><prefix:nextString/></td>
-        <td><prefix:lastString/></td>
-      </tr>
-      <tr>
-        <td></td>
-        <td></td>
-        <td><prefix:ocrText/></td>
-        <td><prefix:correction/></td>
-        <td><prefix:perform/></td>
-      </tr>
-    </table>
-  </lift:ActiveOcrStep4.render>
+  <div>
+    <div>
+      <h2>Active OCR Step 4</h2>
+      <lift:ActiveOcrStep4.renderRight form="POST">
+        <table>
+          <tr>
+            <td><prefix:firstString/></td>
+            <td><prefix:prevString/></td>
+            <td><img src="images/tmp.jpeg"/></td>
+            <td><prefix:nextString/></td>
+            <td><prefix:lastString/></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td><prefix:ocrText/></td>
+            <td><prefix:correction/></td>
+            <td><prefix:perform/></td>
+          </tr>
+        </table>
+      </lift:ActiveOcrStep4.renderRight>
+    </div>
+    <div class="lift:ActiveOcrStep4.renderLeft"/>
+  </div>
 </lift:surround>
