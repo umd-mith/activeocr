@@ -56,8 +56,33 @@ object User extends User with MetaOpenIDProtoUser[User] with LongKeyedMetaMapper
 
 class User extends LongKeyedMapper[User] with OpenIDProtoUser[User] { 
   def getSingleton = User 
-  object uniqueName extends MappedString(this, 32)
-} 
+  private def findByUniqueName(str: String): List[User] = model.User.findAll(By(uniqueName, str))
+  object ValidUniqueName {
+   val is = """^[a-z][a-z0-9_]*$""".r
+   def apply(in: String): Boolean = is.findFirstIn(in).isDefined
+  }
+  object uniqueName extends MappedString(this, 32) {
+    override def dbIndexed_? = true
+    def deDupUnderscore(in: String): String = in.indexOf("__") match {
+      case -1 => in
+      case pos => deDupUnderscore(in.substring(0, pos)+in.substring(pos + 1))
+    }
+    override def setFilter = notNull _ :: toLower _ :: trim _ :: deDupUnderscore _ :: super.setFilter
+    private def validateUniqueName(str: String): List[FieldError] = {
+      val others = getSingleton.findByUniqueName(str).
+      filter(_.id.is != fieldOwner.id.is)
+      others.map(u => FieldError(this, <xml:group>Duplicate uniqueName: {str}</xml:group>))
+    }
+    private def validText(str: String): List[FieldError] =
+    if (ValidUniqueName(str)) Nil
+    else List(FieldError(this,
+                         <xml:group>Invalid uniqueName.  Must start with
+                          a letter and contain only letters,
+                          numbers or "_"</xml:group>))
+      override def validations = validText _ :: validateUniqueName _ :: super.validations
+    }
+  override def niceName: String = uniqueName.get
+}
 
 }
 }
