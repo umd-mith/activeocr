@@ -30,9 +30,9 @@ import scala.io.Source
 import scala.xml.NodeSeq
 import scala.xml.pull.XMLEventReader
 
-object nodesVar3 extends SessionVar[IndexedSeq[Bbox]](IndexedSeq.empty[Bbox])
+object nodesVar4 extends SessionVar[IndexedSeq[Bbox]](IndexedSeq.empty[Bbox])
 
-class ActiveOcrStep3 extends StatefulSnippet {
+class ActiveOcrStep4 extends StatefulSnippet {
   val hocrFileName = "../data/luxmundi302.html"
   val source = Source.fromFile(hocrFileName)
   val reader = new XMLEventReader(source)
@@ -41,24 +41,24 @@ class ActiveOcrStep3 extends StatefulSnippet {
   val img = ImageIO.read(new File(imageFileName))
   val count = (S.param("count") map { _.toInt } openOr(0))
   // enough information to declare and initialize first, prev
-  val firstString = "/activeocr3?count=0"
+  val firstString = "/activeocr4?count=0"
   val prevCount = if (count > 0) count - 1 else 0
-  val prevString = "activeocr3?count=" + prevCount.toString
+  val prevString = "activeocr4?count=" + prevCount.toString
   // not enough information to initialize last, next
   var lastString = ""
   var nextCount = 0
   var nextString = ""
   var ocrText = ""
-  if (nodesVar3.is.isEmpty) {
-    nodesVar3(pages.head.bbList)
+  if (nodesVar4.is.isEmpty) {
+    nodesVar4(pages.head.bbList)
   }
-  val nodes = nodesVar3.is
+  val nodes = nodesVar4.is
   for (page <- pages) {
     // enough information to initialize last, next
     val lastCount = nodes.length - 1
-    lastString = "activeocr3?count=" + lastCount.toString
+    lastString = "activeocr4?count=" + lastCount.toString
     nextCount = if (count < lastCount) count + 1 else lastCount
-    nextString = "activeocr3?count=" + nextCount.toString
+    nextString = "activeocr4?count=" + nextCount.toString
     val thisCount = if (count < 0) 0 else if (count > lastCount) lastCount else count
     nodes(thisCount) match {
       case t@TermWord(s, x, y, w, h) =>
@@ -82,12 +82,12 @@ class ActiveOcrStep3 extends StatefulSnippet {
   }
 
   def updateAt(i: Int, correction: String) = {
-    val nodes = nodesVar3.is
+    val nodes = nodesVar4.is
     val updatedNode = nodes(i) match {
       case t: TermWord => t.copy(s = correction)
       case g: Glyph => g.copy(c = correction)
     }
-    nodesVar3(nodes.updated(i, updatedNode))
+    nodesVar4(nodes.updated(i, updatedNode))
   }
 
   def render(in: NodeSeq): NodeSeq = {
