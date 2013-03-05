@@ -28,7 +28,7 @@ import Helpers._
 
 class ActiveOcrStep0 {
   def transform(in: NodeSeq): NodeSeq = {
-    <img src={"/cached?url=http://localhost:8080/static/images/luxmundi.jpeg&rw=510"}/>
+    <img src={"/cached?url=http://localhost:8080/static/images/luxmundi.jpeg&rw=510"} id="target"/>
   }
 }
 
