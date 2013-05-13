@@ -33,11 +33,13 @@ object OcroReader extends HocrReader {
       while (reader.hasNext) {
         val event = reader.next
         event match {
+          case EvElemStart(_, "br", _, _) => ()
           case EvElemStart(_, "p", _, _) => ()
           case EvElemStart(_, "span", attrs, _) =>
             val clss = attrs.asAttrMap.getOrElse("class", "")
             if (clss == "ocr_line")
               zone = zone.addChild(makeNewLine(reader, attrs))
+          case EvElemEnd(_, "br") => ()
           case EvElemEnd(_, "div") => break
           case EvElemEnd(_, "p") => ()
           case EvText(text) => assume(text.trim.isEmpty)

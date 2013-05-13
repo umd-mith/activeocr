@@ -24,14 +24,14 @@ import scala.xml.pull._
 
 object TestOcro {
   def main(args: Array[String]) {
-    val filename = "/luxmundi2.html"
+    val filename = "/luxmundi07.html"
     val source = Source.fromInputStream(
       getClass.getResourceAsStream(filename)
     )
     val reader = new XMLEventReader(source)
     val formatter = new scala.xml.PrettyPrinter(80, 2)
-    val printer = new java.io.PrintWriter("luxmundi2.svg")
-    val pages = OcroReader.parsePage(reader, this.getClass.getResource("/luxmundi.jpeg").toURI)
+    val printer = new java.io.PrintWriter("luxmundi07.svg")
+    val pages = OcroReader.parsePage(reader, this.getClass.getResource("/luxmundi.png").toURI)
     for (page <- pages)
       printer.println(formatter.format(page.toSVG))
     printer.close()
