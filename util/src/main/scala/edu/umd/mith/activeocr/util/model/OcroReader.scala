@@ -38,7 +38,7 @@ object OcroReader extends HocrReader {
           case EvElemStart(_, "span", attrs, _) =>
             val clss = attrs.asAttrMap.getOrElse("class", "")
             if (clss == "ocr_line")
-              zone = zone.addChild(makeNewLine(reader, attrs))
+              zone = zone.addChild(makeNewLine(reader, attrs, imageH))
           case EvElemEnd(_, "br") => ()
           case EvElemEnd(_, "div") => break
           case EvElemEnd(_, "p") => ()
@@ -51,9 +51,9 @@ object OcroReader extends HocrReader {
     page
   }
 
-  def makeNewLine(reader: XMLEventReader, attributes: MetaData): TermLine = {
+  def makeNewLine(reader: XMLEventReader, attributes: MetaData, imageHeight: Int): TermLine = {
     val title = attributes.asAttrMap.getOrElse("title", "")
-    val (x, y, w, h) = unpackDimensions(title)
+    val (x, y, w, h) = unpackAndFixDimensions(title, imageHeight)
     var tmpText = ""
     breakable {
       while (reader.hasNext) {
@@ -67,6 +67,16 @@ object OcroReader extends HocrReader {
     }
     val line = new TermLine(tmpText, x, y, w, h)
     line
+  }
+
+  def unpackAndFixDimensions(title: String, imageHeight: Int): (Int, Int, Int, Int) = {
+    val Re = ".*bbox (\\d+) (\\d+) (\\d+) (\\d+).*".r
+    val Re(x0, y0, x1, y1) = title
+    val x = x0.toInt; var y = y0.toInt
+    val w = x1.toInt - x0.toInt
+    val h = y1.toInt - y0.toInt
+    y = imageHeight - y - h
+    (x, y, w, h)
   }
 }
 
