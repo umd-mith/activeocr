@@ -23,7 +23,7 @@ import scala.io._
 import scala.xml.pull._
 
 object TestTesseract302 {
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]) {
     val filename = "/luxmundi302.html"
     val source = Source.fromInputStream(
       getClass.getResourceAsStream(filename)
@@ -35,6 +35,7 @@ object TestTesseract302 {
     for (page <- pages)
       printer.println(formatter.format(page.toSVG))
     printer.close()
+    source.close()
   }
 }
 

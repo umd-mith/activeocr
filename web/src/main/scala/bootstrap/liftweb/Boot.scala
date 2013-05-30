@@ -59,6 +59,7 @@ class Boot {
       Menu("Home") / "index" >> User.AddUserMenusAfter, // Simple menu form
       Menu("Active OCR Step 0") / "activeocr0" >> User.AddUserMenusAfter,     
       Menu("Active OCR Step 1") / "activeocr1" >> User.AddUserMenusAfter,
+      Menu("Active OCR Step 1a") / "activeocr1a" >> User.AddUserMenusAfter,
       Menu("Active OCR Step 2") / "activeocr2" >> User.AddUserMenusAfter,
       Menu("Active OCR Step 3") / "activeocr3" >> User.AddUserMenusAfter,    
       Menu("Active OCR Step 4") / "activeocr4" >> User.AddUserMenusAfter,    

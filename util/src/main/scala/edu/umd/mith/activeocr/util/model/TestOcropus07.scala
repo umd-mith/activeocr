@@ -35,7 +35,7 @@ object TestOcropus07 {
     for (page <- pages)
       printer.println(formatter.format(page.toSVG))
     printer.close()
-    source.close
+    source.close()
   }
 }
 
