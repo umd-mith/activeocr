@@ -22,7 +22,7 @@ package edu.umd.mith.activeocr.util.model
 import scala.io._
 import scala.xml.pull._
 
-object TestOcro {
+object TestOcropus07 {
   def main(args: Array[String]) {
     val filename = "/luxmundi07.html"
     val source = Source.fromInputStream(
