@@ -53,7 +53,7 @@ object OcroReader extends HocrReader {
 
   def makeNewLine(reader: XMLEventReader, attributes: MetaData, imageHeight: Int): TermLine = {
     val title = attributes.asAttrMap.getOrElse("title", "")
-    val (x, y, w, h) = unpackAndFixDimensions(title, imageHeight)
+    val (x, y, w, h) = unpackDimensions(title, imageHeight)
     var tmpText = ""
     breakable {
       while (reader.hasNext) {
@@ -69,7 +69,7 @@ object OcroReader extends HocrReader {
     line
   }
 
-  def unpackAndFixDimensions(title: String, imageHeight: Int): (Int, Int, Int, Int) = {
+  def unpackDimensions(title: String, imageHeight: Int): (Int, Int, Int, Int) = {
     val Re = ".*bbox (\\d+) (\\d+) (\\d+) (\\d+).*".r
     val Re(x0, y0, x1, y1) = title
     val x = x0.toInt; var y = y0.toInt
