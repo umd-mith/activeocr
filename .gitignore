@@ -14,6 +14,7 @@ web/.settings
 web/target/
 web/tmp/
 tmp.jpeg
+tmp.png
 *.db
 *.svg
 
