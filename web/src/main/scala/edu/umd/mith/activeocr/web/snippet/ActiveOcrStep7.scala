@@ -20,14 +20,17 @@
 package edu.umd.mith.activeocr.web {
 package snippet {
 
-import edu.umd.mith.activeocr.util.model.{OcroReader, TermLine}
+import edu.umd.mith.activeocr.util.model.{Bbox, OcroReader, TermLine}
 import java.io.File
 import javax.imageio.ImageIO
-import net.liftweb.http.{S, StatefulSnippet}
+import net.liftweb.http.{S, SHtml, SessionVar, StatefulSnippet}
+import net.liftweb.util.Helpers._
 import org.imgscalr.Scalr.crop
 import scala.io.Source
 import scala.xml.NodeSeq
 import scala.xml.pull.XMLEventReader
+
+object nodesVar7 extends SessionVar[IndexedSeq[Bbox]](IndexedSeq.empty[Bbox])
 
 class ActiveOcrStep7 extends StatefulSnippet {
   val hocrFileName = "../data/luxmundi07.html"
@@ -46,8 +49,11 @@ class ActiveOcrStep7 extends StatefulSnippet {
   var nextCount = 0
   var nextString = ""
   var ocrText = ""
+  if (nodesVar7.is.isEmpty) {
+    nodesVar7(pages.head.bbList)
+  }
+  val nodes = nodesVar7.is
   for (page <- pages) {
-    val nodes = page.bbList
     // enough information to initialize last, next
     val lastCount = nodes.length - 1
     lastString = "activeocr7?count=" + lastCount.toString
@@ -66,24 +72,46 @@ class ActiveOcrStep7 extends StatefulSnippet {
   }
 
   def dispatch = {
-    case "transform" => xform
+    case "renderTop" => renderTop
+    case "renderBottom" => renderBottom
   }
 
-  def xform(in: NodeSeq): NodeSeq = {
-    <table>
-    <tr>
-    <td><a href={firstString}>&lt;&lt; First</a></td>
-    <td><a href={prevString}>&lt; Prev</a></td>
-    <td><a href={nextString}>Next &gt;</a></td>
-    <td><a href={lastString}>Last &gt;&gt;</a></td>
-    </tr>
-    <tr>
-    <td colspan="4"><img src="images/tmp.png"/></td>
-    </tr>
-    <tr>
-    <td colspan="4">{ocrText}</td>
-    </tr>
-    </table>
+  def updateAt(i: Int, correction: String) = {
+    val nodes = nodesVar7.is
+    val updatedNode = nodes(i) match {
+      case l: TermLine => l.copy(s = correction)
+    }
+    nodesVar7(nodes.updated(i, updatedNode))
+  }
+
+  def renderTop(in: NodeSeq): NodeSeq = {
+    bind ("prefix", in,
+      "firstString" -> <a href={firstString}>&lt;&lt; First</a>,
+      "prevString" -> <a href={prevString}>&lt; Previous</a>,
+      "nextString" -> <a href={nextString}>Next &gt;</a>,
+      "lastString" -> <a href={lastString}>Last &gt;&gt;</a>,
+      "ocrText" -> ocrText,
+      "correction" -> SHtml.text(ocrText, { s: String => ocrText = s }, "size" -> "80"),
+      "perform" -> SHtml.submit("Submit", () => perform(ocrText))
+    )
+  }
+
+  def renderBottom(in: NodeSeq): NodeSeq = {
+    <div>
+      <svg version="1.1"
+        xmlns="http://www.w3.org/2000/svg"
+        xmlns:xlink="http://www.w3.org/1999/xlink"
+        width="100%" height="100%"
+        viewBox="0 0 680 1149">
+        <image xlink:href="http://localhost:8080/static/images/luxmundi.jpeg"
+          width="680" height="1149"/>
+        { nodes(this.count).toSVG }
+      </svg>
+    </div>
+  }
+
+  def perform(correction: String): Unit = {
+    updateAt(this.count, correction)
   }
 }
 
