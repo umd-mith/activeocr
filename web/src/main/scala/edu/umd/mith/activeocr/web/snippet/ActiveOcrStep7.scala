@@ -92,7 +92,8 @@ class ActiveOcrStep7 extends StatefulSnippet {
       "lastString" -> <a href={lastString}>Last &gt;&gt;</a>,
       "ocrText" -> ocrText,
       "correction" -> SHtml.text(ocrText, { s: String => ocrText = s }, "size" -> "80"),
-      "perform" -> SHtml.submit("Submit", () => perform(ocrText))
+      "perform" -> SHtml.submit("Submit Correction", () => perform(ocrText)),
+      "outputNodes" -> SHtml.submit("Output Nodes", () => outputNodes())
     )
   }
 
@@ -112,6 +113,25 @@ class ActiveOcrStep7 extends StatefulSnippet {
 
   def perform(correction: String): Unit = {
     updateAt(this.count, correction)
+  }
+
+  def outputNodes(): Unit = {
+    val nodes = nodesVar7.is
+    var index = 0
+    var outputFile = "/dev/null"
+    var outputPrinter = new java.io.PrintWriter(outputFile)
+    for (node <- nodes) {
+      node match {
+        case l@TermLine(s, _, _, _, _) => {
+          outputFile = "./tmp/tmp" + f"$index%03d" + ".txt"
+          index = index + 1
+          outputPrinter = new java.io.PrintWriter(outputFile)
+          outputPrinter.println(s)
+          outputPrinter.close()
+        }
+        case _ => assert(false, "Unexpected Bbox type.")
+      }
+    }
   }
 }
 
