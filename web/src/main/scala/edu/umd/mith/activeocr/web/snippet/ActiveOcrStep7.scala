@@ -117,13 +117,13 @@ class ActiveOcrStep7 extends StatefulSnippet {
 
   def outputNodes(): Unit = {
     val nodes = nodesVar7.is
-    var index = 0
+    var index = 1
     var outputFile = "/dev/null"
     var outputPrinter = new java.io.PrintWriter(outputFile)
     for (node <- nodes) {
       node match {
         case l@TermLine(s, _, _, _, _) => {
-          outputFile = "./tmp/tmp" + f"$index%03d" + ".txt"
+          outputFile = "./temp/0001/0100" + f"$index%02x" + ".txt"
           index = index + 1
           outputPrinter = new java.io.PrintWriter(outputFile)
           outputPrinter.println(s)

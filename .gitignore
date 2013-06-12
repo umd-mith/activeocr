@@ -12,7 +12,7 @@ web/.classpath
 web/.project
 web/.settings
 web/target/
-web/tmp/
+web/temp/
 tmp.jpeg
 tmp.png
 *.db
