@@ -92,8 +92,8 @@ class ActiveOcrStep7 extends StatefulSnippet {
       "lastString" -> <a href={lastString}>Last &gt;&gt;</a>,
       "ocrText" -> ocrText,
       "correction" -> SHtml.text(ocrText, { s: String => ocrText = s }, "size" -> "80"),
-      "perform" -> SHtml.submit("Submit Correction", () => perform(ocrText)),
-      "outputNodes" -> SHtml.submit("Output Nodes", () => outputNodes())
+      "perform" -> SHtml.submit("Update", () => perform(ocrText)),
+      "outputNodes" -> SHtml.submit("Output", () => outputNodes())
     )
   }
 
