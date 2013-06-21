@@ -123,7 +123,7 @@ class ActiveOcrStep7 extends StatefulSnippet {
     for (node <- nodes) {
       node match {
         case l@TermLine(s, _, _, _, _) => {
-          outputFile = "./temp/0001/0100" + f"$index%02x" + ".txt"
+          outputFile = "./temp/0001/0100" + f"$index%02x" + ".gt.txt"
           index = index + 1
           outputPrinter = new java.io.PrintWriter(outputFile)
           outputPrinter.println(s)
