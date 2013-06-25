@@ -104,7 +104,7 @@ class ActiveOcrStep7 extends StatefulSnippet {
         xmlns:xlink="http://www.w3.org/1999/xlink"
         width="100%" height="100%"
         viewBox="0 0 680 1149">
-        <image xlink:href="http://localhost:8080/static/images/luxmundi.jpeg"
+        <image xlink:href="http://localhost:8080/static/images/luxmundi.png"
           width="680" height="1149"/>
         { nodes(this.count).toSVG }
       </svg>
