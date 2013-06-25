@@ -1,6 +1,7 @@
 .project
 .settings
 target/
+temp/
 tmp/
 !web/src/main/webapp/images/tmp
 util/.classpath
