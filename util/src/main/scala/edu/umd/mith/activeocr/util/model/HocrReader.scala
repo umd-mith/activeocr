@@ -23,6 +23,7 @@ import java.net.URI
 import javax.media.jai._
 import javax.imageio.ImageIO
 import scala.util.control.Breaks._
+import scala.util.matching.Regex
 import scala.xml.MetaData
 import scala.xml.pull._
 
@@ -34,9 +35,14 @@ class HocrReader {
       reader.next match {
         case EvElemStart(_, "div", attrs, _) =>
           val clss = attrs.asAttrMap.getOrElse("class", "")
+          val title = attrs.asAttrMap.getOrElse("title", "")
+          val pattern = new Regex("""file (temp\/\d{4}.bin.png)""", "filename")
+          val result = pattern.findFirstMatchIn(title).get
+          val filename = result.group("filename")
+          val thisFacsimileUri = this.getClass.getResource("/" + filename).toURI
           if (clss == "ocr_page") {
             val page = makeNewPage(
-              reader, attrs, facsimileUri, image.getWidth, image.getHeight
+              reader, attrs, thisFacsimileUri, image.getWidth, image.getHeight
             )
             pages = pages :+ page
           }

@@ -35,14 +35,14 @@ class OcroReaderTest extends SpecificationWithJUnit with OcroExample {
       this.pages.head.children.size must_== 1
     }
 
-    "have 28 lines in its first zone" in {
-      this.pages.head.children(0).children.size must_== 28
+    "have 32 lines in its first zone" in {
+      this.pages.head.children(0).children.size must_== 32
     }
   }
 }
 
 trait OcroExample extends Scope {
-  val filename = "/luxmundi2.html"
+  val filename = "/luxmundi07.html"
 
   val source = Source.fromInputStream(
     this.getClass.getResourceAsStream(filename)
