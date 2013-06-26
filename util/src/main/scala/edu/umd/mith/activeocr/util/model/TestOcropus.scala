@@ -22,7 +22,7 @@ package edu.umd.mith.activeocr.util.model
 import scala.io._
 import scala.xml.pull._
 
-object TestOcropusMulti {
+object TestOcropus {
   def main(args: Array[String]) {
     val filename = "/luxmundi07multipage.html"
     val source = Source.fromInputStream(
@@ -30,13 +30,10 @@ object TestOcropusMulti {
     )
     val reader = new XMLEventReader(source)
     val formatter = new scala.xml.PrettyPrinter(80, 2)
-    // val pages = OcroReader.parsePage(reader, this.getClass.getResource("/luxmundi.png").toURI)
-    val pages = OcroReader.parsePage(reader, this.getClass.getResource("/temp/0001.bin.png").toURI)
-
+    val pages = OcroReader.parsePage(reader, this.getClass.getResource("/luxmundi.png").toURI)
     var index = 0
     var outFileName = "/dev/null"
     var printer = new java.io.PrintWriter(outFileName)
-
     for (page <- pages) {
       index = index + 1
       outFileName = "luxmundi" + f"$index%03d" + ".svg"
