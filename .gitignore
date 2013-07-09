@@ -1,8 +1,8 @@
 .lib/
 .project
 .settings
+data/temp/
 target/
-temp/
 tmp/
 !web/src/main/webapp/images/tmp
 util/.classpath
