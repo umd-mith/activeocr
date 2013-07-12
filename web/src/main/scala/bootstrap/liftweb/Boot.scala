@@ -66,8 +66,6 @@ class Boot {
       Menu("User") / "user" >> Hidden,    
       Menu("Users") / "users" >> Hidden,    
       // Menu with special Link
-      Menu(Loc("Data", Link(List("data"), true, "../../../../data"),
-               "Hide Me")),
       Menu(Loc("Static", Link(List("static"), true, "/static/index"), 
 	       "Static Content")))
 
