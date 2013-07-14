@@ -59,6 +59,7 @@ class Boot {
       Menu("Home") / "index" >> User.AddUserMenusAfter, // Simple menu form
       Menu("Active OCR Step 7") / "activeocr7" >> User.AddUserMenusAfter,    
       Menu("Active OCR Step 7m") / "activeocr7m" >> User.AddUserMenusAfter,    
+      Menu("Active OCR Step 7osb") / "activeocr7osb" >> User.AddUserMenusAfter,
       // If you don’t add a page to your SiteMap
       // it will not be displayed by Lift on your web site.
       // Menu items marked Hidden will not be displayed in the menu hierarchy,

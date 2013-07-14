@@ -39,7 +39,7 @@ class HocrReader {
           val pattern = new Regex("""file (temp\/\d{4}.bin.png)""", "filename")
           val result = pattern.findFirstMatchIn(title).get
           val filename = result.group("filename")
-          val thisFacsimileUri = new URI("http://localhost:8080/static/images/"+ filename)
+          val thisFacsimileUri = new URI("http://localhost:8080/static/images/" + filename)
           if (clss == "ocr_page") {
             val page = makeNewPage(
               reader, attrs, thisFacsimileUri, image.getWidth, image.getHeight
