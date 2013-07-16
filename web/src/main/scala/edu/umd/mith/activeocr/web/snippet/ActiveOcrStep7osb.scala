@@ -29,6 +29,7 @@ import scala.xml.NodeSeq
 import scala.xml.pull.XMLEventReader
 
 object nodesVar7osb extends SessionVar[IndexedSeq[Bbox]](IndexedSeq.empty[Bbox])
+object pagesVar7osb extends SessionVar[Int](0)
 
 class ActiveOcrStep7osb extends StatefulSnippet {
   val hocrFileName = "../data/luxmundi07multipage.html"
@@ -39,7 +40,8 @@ class ActiveOcrStep7osb extends StatefulSnippet {
 
   val lineNumber = (S.param("line") map { _.toInt } openOr(0))
   val pageNumber = (S.param("page") map { _.toInt } openOr(0))
-  if (nodesVar7osb.is.isEmpty) {
+  val oldPageNumber = pagesVar7osb.is
+  if (nodesVar7osb.is.isEmpty || pageNumber != oldPageNumber) {
     nodesVar7osb(pages(pageNumber).bbList)
   }
   val nodes = nodesVar7osb.is
@@ -55,7 +57,7 @@ class ActiveOcrStep7osb extends StatefulSnippet {
         xmlns:xlink="http://www.w3.org/1999/xlink"
         width="100%" height="100%"
         viewBox="0 0 680 1149">
-        <image xlink:href="http://localhost:8080/static/images/luxmundi.png"
+        <image xlink:href={ pages(pageNumber).getUri() }
           width="680" height="1149"/>
         { nodes(this.lineNumber).toSVG }
       </svg>
