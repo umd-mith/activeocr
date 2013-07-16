@@ -40,14 +40,30 @@ class ActiveOcrStep7osb extends StatefulSnippet {
 
   val lineNumber = (S.param("line") map { _.toInt } openOr(0))
   val pageNumber = (S.param("page") map { _.toInt } openOr(0))
+  val lastPageNumber = pages.length -1
+  val firstPage = "/activeocr7osb?page=0"
+  val prevPage = "/activeocr7osb?page=" + (if (pageNumber > 0) pageNumber - 1 else 0).toString 
+  val nextPage = "/activeocr7osb?page=" + (if (pageNumber < lastPageNumber) pageNumber + 1 else lastPageNumber).toString
+  val lastPage = "/activeocr7osb?page=" + lastPageNumber.toString
   val oldPageNumber = pagesVar7osb.is
   if (nodesVar7osb.is.isEmpty || pageNumber != oldPageNumber) {
     nodesVar7osb(pages(pageNumber).bbList)
   }
+  pagesVar7osb(pageNumber)
   val nodes = nodesVar7osb.is
 
   def dispatch = {
+    case "renderTop" => renderTop
     case "renderBottom" => renderBottom
+  }
+
+  def renderTop(in: NodeSeq): NodeSeq = {
+    bind ("prefix", in,
+      "firstPage" -> <a href={firstPage}>&lt;&lt; First Page</a>,
+      "prevPage" -> <a href={prevPage}>&lt; Previous Page</a>,
+      "nextPage" -> <a href={nextPage}>Next Page &gt;</a>,
+      "lastPage" -> <a href={lastPage}>Last Page &gt;&gt;</a>
+    )
   }
 
   def renderBottom(in: NodeSeq): NodeSeq = {
