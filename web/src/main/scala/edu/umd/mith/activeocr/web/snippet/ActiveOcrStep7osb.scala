@@ -22,8 +22,9 @@ package snippet {
 
 import edu.umd.mith.activeocr.util.model.{Bbox,OcroReader,TermLine}
 import java.io.File
+import java.net.URL
 import javax.imageio.ImageIO
-import net.liftweb.http.{S,SessionVar,StatefulSnippet}
+import net.liftweb.http.{S,SHtml,SessionVar,StatefulSnippet}
 import net.liftweb.util.Helpers._
 import org.imgscalr.Scalr.crop
 import scala.io.Source
@@ -37,8 +38,6 @@ class ActiveOcrStep7osb extends StatefulSnippet {
   val hocrFileName = "../data/luxmundi07multipage.html"
   val source = Source.fromFile(hocrFileName)
   val reader = new XMLEventReader(source)
-  val imageFileName = "../data/luxmundi.png"
-  val img = ImageIO.read(new File(imageFileName))
   val pages = OcroReader.parsePage(reader)
 
   val lineNumber = (S.param("line") map { _.toInt } openOr(0))
@@ -60,9 +59,13 @@ class ActiveOcrStep7osb extends StatefulSnippet {
   val prevLine = thisPage + "&line=" + (if (lineNumber > 0) lineNumber - 1 else 0).toString
   val nextLine = thisPage + "&line=" + (if (lineNumber < lastLineNumber) lineNumber + 1 else lastLineNumber).toString
   val lastLine = thisPage + "&line=" + lastLineNumber.toString
+  val imageFileUrl = pages(pageNumber).getUri
+  val img = ImageIO.read(new URL(imageFileUrl))
+  var ocrText = ""
   nodes(lineNumber) match {
     case l@TermLine(s, x, y, w, h) =>
       if ((w > 0) && (h > 0)) {
+        ocrText = l.s
         var tmpImg = crop(img, x, y, w, h)
         ImageIO.write(tmpImg, "png", new File("./src/main/webapp/images/tmp.png"))
       }
@@ -74,6 +77,14 @@ class ActiveOcrStep7osb extends StatefulSnippet {
     case "renderBottom" => renderBottom
   }
 
+  def updateAt(i: Int, correction: String) = {
+    val nodes = nodesVar7osb.is
+    val updatedNode = nodes(i) match {
+      case l: TermLine => l.copy(s = correction)
+    }
+    nodesVar7osb(nodes.updated(i, updatedNode))
+  }
+
   def renderTop(in: NodeSeq): NodeSeq = {
     bind ("prefix", in,
       "firstPage" -> <a href={firstPage}>&lt;&lt; First Page</a>,
@@ -83,7 +94,11 @@ class ActiveOcrStep7osb extends StatefulSnippet {
       "firstLine" -> <a href={firstLine}>&lt;&lt; First Line</a>,
       "prevLine" -> <a href={prevLine}>&lt; Previous Line</a>,
       "nextLine" -> <a href={nextLine}>Next Line &gt;</a>,
-      "lastLine" -> <a href={lastLine}>Last Line &gt;&gt;</a>
+      "lastLine" -> <a href={lastLine}>Last Line &gt;&gt;</a>,
+      "ocrText" -> ocrText,
+      "correction" -> SHtml.text(ocrText, { s: String => ocrText = s }, "size" -> "80"),
+      "perform" -> SHtml.submit("Update", () => perform(ocrText)),
+      "outputNodes" -> SHtml.submit("Output", () => outputNodes())
     )
   }
 
@@ -99,6 +114,29 @@ class ActiveOcrStep7osb extends StatefulSnippet {
         { nodes(this.lineNumber).toSVG }
       </svg>
     </div>
+  }
+
+  def perform(correction: String): Unit = {
+    updateAt(this.lineNumber, correction)
+  }
+
+  def outputNodes(): Unit = {
+    val nodes = nodesVar7osb.is
+    var index = 1
+    var outputFile = "/dev/null"
+    var outputPrinter = new java.io.PrintWriter(outputFile)
+    for (node <- nodes) {
+      node match {
+        case l@TermLine(s, _, _, _, _) => {
+          outputFile = "./temp/0001/0100" + f"$index%02x" + ".gt.txt"
+          index = index + 1
+          outputPrinter = new java.io.PrintWriter(outputFile)
+          outputPrinter.println(s)
+          outputPrinter.close()
+        }
+        case _ => assert(false, "Unexpected Bbox type.")
+      }
+    }
   }
 }
 
