@@ -40,7 +40,7 @@ class ActiveOcrStep7osb extends StatefulSnippet {
   val reader = new XMLEventReader(source)
   val pages = OcroReader.parsePage(reader)
 
-  val lineNumber = (S.param("line") map { _.toInt } openOr(0))
+  val bboxNumber = (S.param("bbox") map { _.toInt } openOr(0))
   val pageNumber = (S.param("page") map { _.toInt } openOr(0))
   val lastPageNumber = pages.length -1
   val firstPage = "/activeocr7osb?page=0"
@@ -53,16 +53,16 @@ class ActiveOcrStep7osb extends StatefulSnippet {
   }
   pagesVar7osb(pageNumber)
   val nodes = nodesVar7osb.is
-  val lastLineNumber = nodes.length - 1
+  val lastBboxNumber = nodes.length - 1
   val thisPage = "activeocr7osb?page=" + pageNumber.toString
-  val firstLine = thisPage + "&line=0"
-  val prevLine = thisPage + "&line=" + (if (lineNumber > 0) lineNumber - 1 else 0).toString
-  val nextLine = thisPage + "&line=" + (if (lineNumber < lastLineNumber) lineNumber + 1 else lastLineNumber).toString
-  val lastLine = thisPage + "&line=" + lastLineNumber.toString
+  val firstBbox = thisPage + "&bbox=0"
+  val prevBbox = thisPage + "&bbox=" + (if (bboxNumber > 0) bboxNumber - 1 else 0).toString
+  val nextBbox = thisPage + "&bbox=" + (if (bboxNumber < lastBboxNumber) bboxNumber + 1 else lastBboxNumber).toString
+  val lastBbox = thisPage + "&bbox=" + lastBboxNumber.toString
   val imageFileUrl = pages(pageNumber).getUri
   val img = ImageIO.read(new URL(imageFileUrl))
   var ocrText = ""
-  nodes(lineNumber) match {
+  nodes(bboxNumber) match {
     case l@TermLine(s, x, y, w, h) =>
       if ((w > 0) && (h > 0)) {
         ocrText = l.s
@@ -91,10 +91,10 @@ class ActiveOcrStep7osb extends StatefulSnippet {
       "prevPage" -> <a href={prevPage}>&lt; Previous Page</a>,
       "nextPage" -> <a href={nextPage}>Next Page &gt;</a>,
       "lastPage" -> <a href={lastPage}>Last Page &gt;&gt;</a>,
-      "firstLine" -> <a href={firstLine}>&lt;&lt; First Line</a>,
-      "prevLine" -> <a href={prevLine}>&lt; Previous Line</a>,
-      "nextLine" -> <a href={nextLine}>Next Line &gt;</a>,
-      "lastLine" -> <a href={lastLine}>Last Line &gt;&gt;</a>,
+      "firstBbox" -> <a href={firstBbox}>&lt;&lt; First Bbox</a>,
+      "prevBbox" -> <a href={prevBbox}>&lt; Previous Bbox</a>,
+      "nextBbox" -> <a href={nextBbox}>Next Bbox &gt;</a>,
+      "lastBbox" -> <a href={lastBbox}>Last Bbox &gt;&gt;</a>,
       "ocrText" -> ocrText,
       "correction" -> SHtml.text(ocrText, { s: String => ocrText = s }, "size" -> "80"),
       "perform" -> SHtml.submit("Update", () => perform(ocrText)),
@@ -111,16 +111,17 @@ class ActiveOcrStep7osb extends StatefulSnippet {
         viewBox="0 0 680 1149">
         <image xlink:href={ pages(pageNumber).getUri() }
           width="680" height="1149"/>
-        { nodes(this.lineNumber).toSVG }
+        { nodes(this.bboxNumber).toSVG }
       </svg>
     </div>
   }
 
   def perform(correction: String): Unit = {
-    updateAt(this.lineNumber, correction)
+    updateAt(this.bboxNumber, correction)
   }
 
   def outputNodes(): Unit = {
+    val dirNumber = pageNumber + 1
     val nodes = nodesVar7osb.is
     var index = 1
     var outputFile = "/dev/null"
@@ -128,7 +129,7 @@ class ActiveOcrStep7osb extends StatefulSnippet {
     for (node <- nodes) {
       node match {
         case l@TermLine(s, _, _, _, _) => {
-          outputFile = "./temp/0001/0100" + f"$index%02x" + ".gt.txt"
+          outputFile = "./temp/" + f"$dirNumber%04d" + "/0100" + f"$index%02x" + ".gt.txt"
           index = index + 1
           outputPrinter = new java.io.PrintWriter(outputFile)
           outputPrinter.println(s)
