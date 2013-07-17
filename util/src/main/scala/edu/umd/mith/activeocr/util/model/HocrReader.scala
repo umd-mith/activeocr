@@ -19,6 +19,7 @@
  */
 package edu.umd.mith.activeocr.util.model
 
+import java.io.File
 import java.net.URI
 import javax.media.jai._
 import javax.imageio.ImageIO
@@ -28,9 +29,8 @@ import scala.xml.MetaData
 import scala.xml.pull._
 
 class HocrReader { 
-  def parsePage(reader: XMLEventReader, facsimileUri: URI): Seq[Page] = {
+  def parsePage(reader: XMLEventReader): Seq[Page] = {
     var pages = Seq[Page]()
-    val image = ImageIO.read(facsimileUri.toURL)
     while (reader.hasNext) {
       reader.next match {
         case EvElemStart(_, "div", attrs, _) =>
@@ -39,10 +39,12 @@ class HocrReader {
           val pattern = new Regex("""file (temp\/\d{4}.bin.png)""", "filename")
           val result = pattern.findFirstMatchIn(title).get
           val filename = result.group("filename")
-          val thisFacsimileUri = new URI("http://localhost:8080/static/images/" + filename)
+          val facsimileUri = new URI("http://localhost:8080/static/images/" + filename)
+          val imageFileName = "../web/src/main/webapp/static/images/" + filename
+          val image = ImageIO.read(new File(imageFileName))
           if (clss == "ocr_page") {
             val page = makeNewPage(
-              reader, attrs, thisFacsimileUri, image.getWidth, image.getHeight
+              reader, attrs, facsimileUri, image.getWidth, image.getHeight
             )
             pages = pages :+ page
           }

@@ -31,8 +31,7 @@ class ActiveOcrStep7m {
   val hocrFileName = "../data/luxmundi07multipage.html"
   val source = Source.fromFile(hocrFileName)
   val reader = new XMLEventReader(source)
-  val imageFileName = "../data/luxmundi.png"
-  val pages = OcroReader.parsePage(reader, new File(imageFileName).toURI)
+  val pages = OcroReader.parsePage(reader)
 
   def transform(in: NodeSeq): NodeSeq = {
     <div>

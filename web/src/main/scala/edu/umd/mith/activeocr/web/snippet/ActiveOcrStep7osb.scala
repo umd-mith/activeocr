@@ -39,7 +39,7 @@ class ActiveOcrStep7osb extends StatefulSnippet {
   val reader = new XMLEventReader(source)
   val imageFileName = "../data/luxmundi.png"
   val img = ImageIO.read(new File(imageFileName))
-  val pages = OcroReader.parsePage(reader, new File(imageFileName).toURI)
+  val pages = OcroReader.parsePage(reader)
 
   val lineNumber = (S.param("line") map { _.toInt } openOr(0))
   val pageNumber = (S.param("page") map { _.toInt } openOr(0))

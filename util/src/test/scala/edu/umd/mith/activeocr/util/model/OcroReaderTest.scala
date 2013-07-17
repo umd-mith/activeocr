@@ -49,9 +49,7 @@ trait OcroExample extends Scope {
   )
 
   val reader = new XMLEventReader(source)
-  val pages = OcroReader.parsePage(
-    reader, this.getClass.getResource("/luxmundi.png").toURI
-  )
+  val pages = OcroReader.parsePage(reader)
 
   source.close()
 }

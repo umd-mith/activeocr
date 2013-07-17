@@ -38,7 +38,7 @@ class ActiveOcrStep7 extends StatefulSnippet {
   val reader = new XMLEventReader(source)
   val imageFileName = "../data/luxmundi.png"
   val img = ImageIO.read(new File(imageFileName))
-  val pages = OcroReader.parsePage(reader, new File(imageFileName).toURI)
+  val pages = OcroReader.parsePage(reader)
   val count = (S.param("count") map { _.toInt } openOr(0))
   // enough information to declare and initialize first, prev
   val firstString = "/activeocr7?count=0" // WHY '/'?
