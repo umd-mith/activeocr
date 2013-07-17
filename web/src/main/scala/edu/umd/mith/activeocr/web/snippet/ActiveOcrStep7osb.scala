@@ -20,10 +20,12 @@
 package edu.umd.mith.activeocr.web {
 package snippet {
 
-import edu.umd.mith.activeocr.util.model.{Bbox,OcroReader}
+import edu.umd.mith.activeocr.util.model.{Bbox,OcroReader,TermLine}
 import java.io.File
+import javax.imageio.ImageIO
 import net.liftweb.http.{S,SessionVar,StatefulSnippet}
 import net.liftweb.util.Helpers._
+import org.imgscalr.Scalr.crop
 import scala.io.Source
 import scala.xml.NodeSeq
 import scala.xml.pull.XMLEventReader
@@ -36,6 +38,7 @@ class ActiveOcrStep7osb extends StatefulSnippet {
   val source = Source.fromFile(hocrFileName)
   val reader = new XMLEventReader(source)
   val imageFileName = "../data/luxmundi.png"
+  val img = ImageIO.read(new File(imageFileName))
   val pages = OcroReader.parsePage(reader, new File(imageFileName).toURI)
 
   val lineNumber = (S.param("line") map { _.toInt } openOr(0))
@@ -57,6 +60,14 @@ class ActiveOcrStep7osb extends StatefulSnippet {
   val prevLine = thisPage + "&line=" + (if (lineNumber > 0) lineNumber - 1 else 0).toString
   val nextLine = thisPage + "&line=" + (if (lineNumber < lastLineNumber) lineNumber + 1 else lastLineNumber).toString
   val lastLine = thisPage + "&line=" + lastLineNumber.toString
+  nodes(lineNumber) match {
+    case l@TermLine(s, x, y, w, h) =>
+      if ((w > 0) && (h > 0)) {
+        var tmpImg = crop(img, x, y, w, h)
+        ImageIO.write(tmpImg, "png", new File("./src/main/webapp/images/tmp.png"))
+      }
+    case _ => () // do nothing
+  }
 
   def dispatch = {
     case "renderTop" => renderTop
