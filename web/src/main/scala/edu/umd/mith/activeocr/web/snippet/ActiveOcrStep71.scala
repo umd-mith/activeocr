@@ -28,8 +28,7 @@ import scala.xml.NodeSeq
 import scala.xml.pull.XMLEventReader
 
 class ActiveOcrStep71 {
-  val hocrFileName = "../data/luxmundi07multipage.html"
-  val source = Source.fromFile(hocrFileName)
+  val source = Source.fromFile("../data/luxmundi07multipage.html")
   val reader = new XMLEventReader(source)
   val pages = OcroReader.parsePage(reader)
 

@@ -33,54 +33,38 @@ import scala.xml.pull.XMLEventReader
 object nodesVar70 extends SessionVar[IndexedSeq[Bbox]](IndexedSeq.empty[Bbox])
 
 class ActiveOcrStep70 extends StatefulSnippet {
-  val hocrFileName = "../data/luxmundi07.html"
-  val source = Source.fromFile(hocrFileName)
+  val source = Source.fromFile("../data/luxmundi07.html")
   val reader = new XMLEventReader(source)
   val pages = OcroReader.parsePage(reader)
-
-  val img = ImageIO.read(new File("../data/luxmundi.png"))
-
-  val bboxNumber = (S.param("bbox") map { _.toInt } openOr(0))
-  // enough information to declare and initialize first, prev
-  val firstBbox = "/activeocr70?bbox=0"
-  val prevBbox = "/activeocr70?bbox=" + (if (bboxNumber > 0) bboxNumber - 1 else 0).toString
-  // not enough information to initialize last, next
-  var lastBbox = ""
-  var nextBbox = ""
-  var ocrText = ""
-  var thisCount = 0
   if (nodesVar70.is.isEmpty) {
     nodesVar70(pages.head.bbList)
   }
   val nodes = nodesVar70.is
   val lastBboxNumber = nodes.length - 1
+  val tmpBboxNumber = (S.param("bbox") map { _.toInt } openOr(0))
+  val bboxNumber = if (tmpBboxNumber < 0) 0 else if (tmpBboxNumber > lastBboxNumber) lastBboxNumber else tmpBboxNumber
+  val queryString = "/activeocr70?bbox="
+  val firstBbox = queryString + 0.toString
+  val prevBbox = queryString + (if (bboxNumber > 0) bboxNumber - 1 else 0).toString
+  val nextBbox = queryString + (if (bboxNumber < lastBboxNumber) bboxNumber + 1 else lastBboxNumber).toString
+  val lastBbox = queryString + lastBboxNumber.toString
+  val img = ImageIO.read(new File("../data/luxmundi.png"))
+  var ocrText = ""
   for (page <- pages) {
-    // enough information to initialize last, next
-    lastBbox = "/activeocr70?bbox=" + (nodes.length - 1).toString
-    nextBbox = "/activeocr70?bbox=" + (if (bboxNumber < lastBboxNumber) bboxNumber + 1 else lastBboxNumber).toString
-    thisCount = if (bboxNumber < 0) 0 else if (bboxNumber > lastBboxNumber) lastBboxNumber else bboxNumber
-    nodes(thisCount) match {
+    nodes(bboxNumber) match {
       case l@TermLine(s, x, y, w, h) =>
         if ((w > 0) && (h > 0)) {
           ocrText = l.s
           var tmpImg = crop(img, x, y, w, h)
           ImageIO.write(tmpImg, "png", new File("./src/main/webapp/images/tmp.png"))
         }
-      case _ => () // do nothing
+      case _ => ()
     }
   }
 
   def dispatch = {
     case "renderTop" => renderTop
     case "renderBottom" => renderBottom
-  }
-
-  def updateAt(i: Int, correction: String) = {
-    val nodes = nodesVar70.is
-    val updatedNode = nodes(i) match {
-      case l: TermLine => l.copy(s = correction)
-    }
-    nodesVar70(nodes.updated(i, updatedNode))
   }
 
   def renderTop(in: NodeSeq): NodeSeq = {
@@ -105,13 +89,21 @@ class ActiveOcrStep70 extends StatefulSnippet {
         viewBox="0 0 680 1149">
         <image xlink:href="http://localhost:8080/static/images/luxmundi.png"
           width="680" height="1149"/>
-        { nodes(this.thisCount).toSVG }
+        { nodes(this.bboxNumber).toSVG }
       </svg>
     </div>
   }
 
   def perform(correction: String): Unit = {
     updateAt(this.bboxNumber, correction)
+  }
+
+  def updateAt(i: Int, correction: String) = {
+    val nodes = nodesVar70.is
+    val updatedNode = nodes(i) match {
+      case l: TermLine => l.copy(s = correction)
+    }
+    nodesVar70(nodes.updated(i, updatedNode))
   }
 
   def outputNodes(): Unit = {

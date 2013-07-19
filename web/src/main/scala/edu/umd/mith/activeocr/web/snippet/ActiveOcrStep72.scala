@@ -35,18 +35,17 @@ object nodesVar72 extends SessionVar[IndexedSeq[Bbox]](IndexedSeq.empty[Bbox])
 object pagesVar72 extends SessionVar[Int](0)
 
 class ActiveOcrStep72 extends StatefulSnippet {
-  val hocrFileName = "../data/luxmundi07multipage.html"
-  val source = Source.fromFile(hocrFileName)
+  val source = Source.fromFile("../data/luxmundi07multipage.html")
   val reader = new XMLEventReader(source)
   val pages = OcroReader.parsePage(reader)
-
-  val bboxNumber = (S.param("bbox") map { _.toInt } openOr(0))
-  val pageNumber = (S.param("page") map { _.toInt } openOr(0))
   val lastPageNumber = pages.length -1
-  val firstPage = "/activeocr72?page=0"
-  val prevPage = "/activeocr72?page=" + (if (pageNumber > 0) pageNumber - 1 else 0).toString 
-  val nextPage = "/activeocr72?page=" + (if (pageNumber < lastPageNumber) pageNumber + 1 else lastPageNumber).toString
-  val lastPage = "/activeocr72?page=" + lastPageNumber.toString
+  val tmpPageNumber = (S.param("page") map { _.toInt } openOr(0))
+  val pageNumber = if (tmpPageNumber < 0) 0 else if (tmpPageNumber > lastPageNumber) lastPageNumber else tmpPageNumber
+  val pageString = "/activeocr72?page="
+  val firstPage = pageString + 0.toString
+  val prevPage = pageString + (if (pageNumber > 0) pageNumber - 1 else 0).toString
+  val nextPage = pageString + (if (pageNumber < lastPageNumber) pageNumber + 1 else lastPageNumber).toString
+  val lastPage = pageString + lastPageNumber.toString
   val oldPageNumber = pagesVar72.is
   if (nodesVar72.is.isEmpty || pageNumber != oldPageNumber) {
     nodesVar72(pages(pageNumber).bbList)
@@ -54,13 +53,14 @@ class ActiveOcrStep72 extends StatefulSnippet {
   pagesVar72(pageNumber)
   val nodes = nodesVar72.is
   val lastBboxNumber = nodes.length - 1
-  val thisPage = "activeocr72?page=" + pageNumber.toString
-  val firstBbox = thisPage + "&bbox=0"
-  val prevBbox = thisPage + "&bbox=" + (if (bboxNumber > 0) bboxNumber - 1 else 0).toString
-  val nextBbox = thisPage + "&bbox=" + (if (bboxNumber < lastBboxNumber) bboxNumber + 1 else lastBboxNumber).toString
-  val lastBbox = thisPage + "&bbox=" + lastBboxNumber.toString
-  val imageFileUrl = pages(pageNumber).getUri
-  val img = ImageIO.read(new URL(imageFileUrl))
+  val tmpBboxNumber = (S.param("bbox") map { _.toInt } openOr(0))
+  val bboxNumber = if (tmpBboxNumber < 0) 0 else if (tmpBboxNumber > lastBboxNumber) lastBboxNumber else tmpBboxNumber
+  val queryString = pageString + pageNumber.toString + "&bbox="
+  val firstBbox = queryString + 0.toString
+  val prevBbox = queryString + (if (bboxNumber > 0) bboxNumber - 1 else 0).toString
+  val nextBbox = queryString + (if (bboxNumber < lastBboxNumber) bboxNumber + 1 else lastBboxNumber).toString
+  val lastBbox = queryString + lastBboxNumber.toString
+  val img = ImageIO.read(new URL(pages(pageNumber).getUri))
   var ocrText = ""
   nodes(bboxNumber) match {
     case l@TermLine(s, x, y, w, h) =>
@@ -69,20 +69,12 @@ class ActiveOcrStep72 extends StatefulSnippet {
         var tmpImg = crop(img, x, y, w, h)
         ImageIO.write(tmpImg, "png", new File("./src/main/webapp/images/tmp.png"))
       }
-    case _ => () // do nothing
+    case _ => ()
   }
 
   def dispatch = {
     case "renderTop" => renderTop
     case "renderBottom" => renderBottom
-  }
-
-  def updateAt(i: Int, correction: String) = {
-    val nodes = nodesVar72.is
-    val updatedNode = nodes(i) match {
-      case l: TermLine => l.copy(s = correction)
-    }
-    nodesVar72(nodes.updated(i, updatedNode))
   }
 
   def renderTop(in: NodeSeq): NodeSeq = {
@@ -118,6 +110,14 @@ class ActiveOcrStep72 extends StatefulSnippet {
 
   def perform(correction: String): Unit = {
     updateAt(this.bboxNumber, correction)
+  }
+
+  def updateAt(i: Int, correction: String) = {
+    val nodes = nodesVar72.is
+    val updatedNode = nodes(i) match {
+      case l: TermLine => l.copy(s = correction)
+    }
+    nodesVar72(nodes.updated(i, updatedNode))
   }
 
   def outputNodes(): Unit = {
