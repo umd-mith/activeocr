@@ -2,7 +2,7 @@
   #%L
   Active OCR Web Application
   %%
-  Copyright (C) 2011 - 2013 Maryland Institute for Technology in the Humanities
+  Copyright (C) 2011 - 2013 University of Maryland
   %%
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -20,15 +20,21 @@
 <lift:surround with="default" at="content">
   <div>
     <div>
-      <lift:ActiveOcrStep7.renderTop form="POST">
-        <h2>Active OCR Step 7</h2>
+      <lift:ActiveOcrStep72.renderTop form="POST">
+        <h2>Active OCR Step 7.2</h2>
         <h3>(OCRopus 0.7)</h3>
         <table>
           <tr>
-            <td><prefix:firstString/></td>
-            <td><prefix:prevString/></td>
-            <td><prefix:nextString/></td>
-            <td><prefix:lastString/></td>
+            <td><prefix:firstPage/></td>
+            <td><prefix:prevPage/></td>
+            <td><prefix:nextPage/></td>
+            <td><prefix:lastPage/></td>
+          </tr>
+          <tr>
+            <td><prefix:firstBbox/></td>
+            <td><prefix:prevBbox/></td>
+            <td><prefix:nextBbox/></td>
+            <td><prefix:lastBbox/></td>
           </tr>
           <tr>
             <td align="center" colspan="4"><img src="images/tmp.png"/></td>
@@ -41,8 +47,8 @@
             <td/><td/><td/><td><prefix:outputNodes/></td>
           </tr>
         </table>
-      </lift:ActiveOcrStep7.renderTop>
+      </lift:ActiveOcrStep72.renderTop>
     </div>
-    <div class="lift:ActiveOcrStep7.renderBottom"/>
+    <div class="lift:ActiveOcrStep72.renderBottom"/>
   </div>
 </lift:surround>

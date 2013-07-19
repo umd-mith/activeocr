@@ -20,16 +20,10 @@
 <lift:surround with="default" at="content">
   <div>
     <div>
-      <lift:ActiveOcrStep7osb.renderTop form="POST">
-        <h2>Active OCR Step 7 (One Step Beyond)</h2>
+      <lift:ActiveOcrStep70.renderTop form="POST">
+        <h2>Active OCR Step 7.0</h2>
         <h3>(OCRopus 0.7)</h3>
         <table>
-          <tr>
-            <td><prefix:firstPage/></td>
-            <td><prefix:prevPage/></td>
-            <td><prefix:nextPage/></td>
-            <td><prefix:lastPage/></td>
-          </tr>
           <tr>
             <td><prefix:firstBbox/></td>
             <td><prefix:prevBbox/></td>
@@ -47,8 +41,8 @@
             <td/><td/><td/><td><prefix:outputNodes/></td>
           </tr>
         </table>
-      </lift:ActiveOcrStep7osb.renderTop>
+      </lift:ActiveOcrStep70.renderTop>
     </div>
-    <div class="lift:ActiveOcrStep7osb.renderBottom"/>
+    <div class="lift:ActiveOcrStep70.renderBottom"/>
   </div>
 </lift:surround>

@@ -20,56 +20,54 @@
 package edu.umd.mith.activeocr.web {
 package snippet {
 
-import edu.umd.mith.activeocr.util.model.{Bbox,OcroReader,TermLine}
+import edu.umd.mith.activeocr.util.model.{Bbox, OcroReader, TermLine}
 import java.io.File
-import java.net.URL
 import javax.imageio.ImageIO
-import net.liftweb.http.{S,SHtml,SessionVar,StatefulSnippet}
+import net.liftweb.http.{S, SessionVar, SHtml, StatefulSnippet}
 import net.liftweb.util.Helpers._
 import org.imgscalr.Scalr.crop
 import scala.io.Source
 import scala.xml.NodeSeq
 import scala.xml.pull.XMLEventReader
 
-object nodesVar7osb extends SessionVar[IndexedSeq[Bbox]](IndexedSeq.empty[Bbox])
-object pagesVar7osb extends SessionVar[Int](0)
+object nodesVar70 extends SessionVar[IndexedSeq[Bbox]](IndexedSeq.empty[Bbox])
 
-class ActiveOcrStep7osb extends StatefulSnippet {
-  val hocrFileName = "../data/luxmundi07multipage.html"
+class ActiveOcrStep70 extends StatefulSnippet {
+  val hocrFileName = "../data/luxmundi07.html"
   val source = Source.fromFile(hocrFileName)
   val reader = new XMLEventReader(source)
   val pages = OcroReader.parsePage(reader)
 
+  val img = ImageIO.read(new File("../data/luxmundi.png"))
+
   val bboxNumber = (S.param("bbox") map { _.toInt } openOr(0))
-  val pageNumber = (S.param("page") map { _.toInt } openOr(0))
-  val lastPageNumber = pages.length -1
-  val firstPage = "/activeocr7osb?page=0"
-  val prevPage = "/activeocr7osb?page=" + (if (pageNumber > 0) pageNumber - 1 else 0).toString 
-  val nextPage = "/activeocr7osb?page=" + (if (pageNumber < lastPageNumber) pageNumber + 1 else lastPageNumber).toString
-  val lastPage = "/activeocr7osb?page=" + lastPageNumber.toString
-  val oldPageNumber = pagesVar7osb.is
-  if (nodesVar7osb.is.isEmpty || pageNumber != oldPageNumber) {
-    nodesVar7osb(pages(pageNumber).bbList)
-  }
-  pagesVar7osb(pageNumber)
-  val nodes = nodesVar7osb.is
-  val lastBboxNumber = nodes.length - 1
-  val thisPage = "activeocr7osb?page=" + pageNumber.toString
-  val firstBbox = thisPage + "&bbox=0"
-  val prevBbox = thisPage + "&bbox=" + (if (bboxNumber > 0) bboxNumber - 1 else 0).toString
-  val nextBbox = thisPage + "&bbox=" + (if (bboxNumber < lastBboxNumber) bboxNumber + 1 else lastBboxNumber).toString
-  val lastBbox = thisPage + "&bbox=" + lastBboxNumber.toString
-  val imageFileUrl = pages(pageNumber).getUri
-  val img = ImageIO.read(new URL(imageFileUrl))
+  // enough information to declare and initialize first, prev
+  val firstBbox = "/activeocr70?bbox=0"
+  val prevBbox = "/activeocr70?bbox=" + (if (bboxNumber > 0) bboxNumber - 1 else 0).toString
+  // not enough information to initialize last, next
+  var lastBbox = ""
+  var nextBbox = ""
   var ocrText = ""
-  nodes(bboxNumber) match {
-    case l@TermLine(s, x, y, w, h) =>
-      if ((w > 0) && (h > 0)) {
-        ocrText = l.s
-        var tmpImg = crop(img, x, y, w, h)
-        ImageIO.write(tmpImg, "png", new File("./src/main/webapp/images/tmp.png"))
-      }
-    case _ => () // do nothing
+  var thisCount = 0
+  if (nodesVar70.is.isEmpty) {
+    nodesVar70(pages.head.bbList)
+  }
+  val nodes = nodesVar70.is
+  val lastBboxNumber = nodes.length - 1
+  for (page <- pages) {
+    // enough information to initialize last, next
+    lastBbox = "/activeocr70?bbox=" + (nodes.length - 1).toString
+    nextBbox = "/activeocr70?bbox=" + (if (bboxNumber < lastBboxNumber) bboxNumber + 1 else lastBboxNumber).toString
+    thisCount = if (bboxNumber < 0) 0 else if (bboxNumber > lastBboxNumber) lastBboxNumber else bboxNumber
+    nodes(thisCount) match {
+      case l@TermLine(s, x, y, w, h) =>
+        if ((w > 0) && (h > 0)) {
+          ocrText = l.s
+          var tmpImg = crop(img, x, y, w, h)
+          ImageIO.write(tmpImg, "png", new File("./src/main/webapp/images/tmp.png"))
+        }
+      case _ => () // do nothing
+    }
   }
 
   def dispatch = {
@@ -78,19 +76,15 @@ class ActiveOcrStep7osb extends StatefulSnippet {
   }
 
   def updateAt(i: Int, correction: String) = {
-    val nodes = nodesVar7osb.is
+    val nodes = nodesVar70.is
     val updatedNode = nodes(i) match {
       case l: TermLine => l.copy(s = correction)
     }
-    nodesVar7osb(nodes.updated(i, updatedNode))
+    nodesVar70(nodes.updated(i, updatedNode))
   }
 
   def renderTop(in: NodeSeq): NodeSeq = {
     bind ("prefix", in,
-      "firstPage" -> <a href={firstPage}>&lt;&lt; First Page</a>,
-      "prevPage" -> <a href={prevPage}>&lt; Previous Page</a>,
-      "nextPage" -> <a href={nextPage}>Next Page &gt;</a>,
-      "lastPage" -> <a href={lastPage}>Last Page &gt;&gt;</a>,
       "firstBbox" -> <a href={firstBbox}>&lt;&lt; First Bbox</a>,
       "prevBbox" -> <a href={prevBbox}>&lt; Previous Bbox</a>,
       "nextBbox" -> <a href={nextBbox}>Next Bbox &gt;</a>,
@@ -109,9 +103,9 @@ class ActiveOcrStep7osb extends StatefulSnippet {
         xmlns:xlink="http://www.w3.org/1999/xlink"
         width="100%" height="100%"
         viewBox="0 0 680 1149">
-        <image xlink:href={ pages(pageNumber).getUri() }
+        <image xlink:href="http://localhost:8080/static/images/luxmundi.png"
           width="680" height="1149"/>
-        { nodes(this.bboxNumber).toSVG }
+        { nodes(this.thisCount).toSVG }
       </svg>
     </div>
   }
@@ -121,15 +115,14 @@ class ActiveOcrStep7osb extends StatefulSnippet {
   }
 
   def outputNodes(): Unit = {
-    val dirNumber = pageNumber + 1
-    val nodes = nodesVar7osb.is
+    val nodes = nodesVar70.is
     var index = 1
     var outputFile = "/dev/null"
     var outputPrinter = new java.io.PrintWriter(outputFile)
     for (node <- nodes) {
       node match {
         case l@TermLine(s, _, _, _, _) => {
-          outputFile = "./temp/" + f"$dirNumber%04d" + "/0100" + f"$index%02x" + ".gt.txt"
+          outputFile = "./temp/0001/0100" + f"$index%02x" + ".gt.txt"
           index = index + 1
           outputPrinter = new java.io.PrintWriter(outputFile)
           outputPrinter.println(s)
