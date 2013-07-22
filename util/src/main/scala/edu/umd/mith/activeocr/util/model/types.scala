@@ -111,10 +111,6 @@ case class Page(children: IndexedSeq[Zone], uri: String, imageW: Int, imageH: In
         width={imageW.toString} height={imageH.toString}/>
       { this.children.map(_.toSVG) }
     </svg>
-
-  def getUri(): String = {
-    uri
-  }
 }
 
 trait FormatReader[A <: Bbox, B <: Container[A, B]] extends Iterable[A] {

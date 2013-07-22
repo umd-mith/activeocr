@@ -39,8 +39,11 @@ class ActiveOcrStep72 extends StatefulSnippet {
   val reader = new XMLEventReader(source)
   val pages = OcroReader.parsePage(reader)
   val lastPageNumber = pages.length -1
-  val tmpPageNumber = (S.param("page") map { _.toInt } openOr(0))
-  val pageNumber = if (tmpPageNumber < 0) 0 else if (tmpPageNumber > lastPageNumber) lastPageNumber else tmpPageNumber
+  val pageNumber = S.param("page").map(_.toInt).map {
+    case tmp if tmp < 0 => 0
+    case tmp if tmp > lastPageNumber => lastPageNumber
+    case tmp => tmp
+  }.openOr(0)
   val pageString = "/activeocr72?page="
   val firstPage = pageString + 0.toString
   val prevPage = pageString + (if (pageNumber > 0) pageNumber - 1 else 0).toString
@@ -53,14 +56,17 @@ class ActiveOcrStep72 extends StatefulSnippet {
   pagesVar72(pageNumber)
   val nodes = nodesVar72.is
   val lastBboxNumber = nodes.length - 1
-  val tmpBboxNumber = (S.param("bbox") map { _.toInt } openOr(0))
-  val bboxNumber = if (tmpBboxNumber < 0) 0 else if (tmpBboxNumber > lastBboxNumber) lastBboxNumber else tmpBboxNumber
+  val bboxNumber = S.param("bbox").map(_.toInt).map {
+    case tmp if tmp < 0 => 0
+    case tmp if tmp > lastBboxNumber => lastBboxNumber
+    case tmp => tmp
+  }.openOr(0)
   val queryString = pageString + pageNumber.toString + "&bbox="
   val firstBbox = queryString + 0.toString
   val prevBbox = queryString + (if (bboxNumber > 0) bboxNumber - 1 else 0).toString
   val nextBbox = queryString + (if (bboxNumber < lastBboxNumber) bboxNumber + 1 else lastBboxNumber).toString
   val lastBbox = queryString + lastBboxNumber.toString
-  val img = ImageIO.read(new URL(pages(pageNumber).getUri))
+  val img = ImageIO.read(new URL(pages(pageNumber).uri))
   var ocrText = ""
   nodes(bboxNumber) match {
     case l@TermLine(s, x, y, w, h) =>
@@ -100,9 +106,9 @@ class ActiveOcrStep72 extends StatefulSnippet {
         xmlns="http://www.w3.org/2000/svg"
         xmlns:xlink="http://www.w3.org/1999/xlink"
         width="100%" height="100%"
-        viewBox="0 0 680 1149">
-        <image xlink:href={ pages(pageNumber).getUri() }
-          width="680" height="1149"/>
+        viewBox={ "0 0 " + pages(pageNumber).imageW.toString + " " + pages(pageNumber).imageH.toString }>
+        <image xlink:href={ pages(pageNumber).uri }
+          width={ pages(pageNumber).imageW.toString } height={ pages(pageNumber).imageH.toString }/>
         { nodes(this.bboxNumber).toSVG }
       </svg>
     </div>
