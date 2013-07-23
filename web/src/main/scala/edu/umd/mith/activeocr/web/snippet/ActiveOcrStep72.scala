@@ -72,7 +72,7 @@ class ActiveOcrStep72 extends StatefulSnippet {
     case l@TermLine(s, x, y, w, h) =>
       if ((w > 0) && (h > 0)) {
         ocrText = l.s
-        var tmpImg = crop(img, x, y, w, h)
+        val tmpImg = crop(img, x, y, w, h)
         ImageIO.write(tmpImg, "png", new File("./src/main/webapp/images/tmp.png"))
       }
     case _ => ()
@@ -129,15 +129,13 @@ class ActiveOcrStep72 extends StatefulSnippet {
   def outputNodes(): Unit = {
     val dirNumber = pageNumber + 1
     val nodes = nodesVar72.is
-    var index = 1
-    var outputFile = "/dev/null"
-    var outputPrinter = new java.io.PrintWriter(outputFile)
+    var index = 0
     for (node <- nodes) {
       node match {
         case l@TermLine(s, _, _, _, _) => {
-          outputFile = "./temp/" + f"$dirNumber%04d" + "/0100" + f"$index%02x" + ".gt.txt"
           index = index + 1
-          outputPrinter = new java.io.PrintWriter(outputFile)
+          val outputFile = "./temp/" + f"$dirNumber%04d" + "/0100" + f"$index%02x" + ".gt.txt"
+          val outputPrinter = new java.io.PrintWriter(outputFile)
           outputPrinter.println(s)
           outputPrinter.close()
         }
