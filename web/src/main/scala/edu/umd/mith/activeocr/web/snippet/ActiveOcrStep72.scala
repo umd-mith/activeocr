@@ -17,8 +17,7 @@
  * limitations under the License.
  * #L%
  */
-package edu.umd.mith.activeocr.web {
-package snippet {
+package edu.umd.mith.activeocr.web.snippet
 
 import edu.umd.mith.activeocr.util.model.{Bbox, OcroReader, TermLine}
 import java.io.File
@@ -106,13 +105,13 @@ class ActiveOcrStep72 extends StatefulSnippet {
         viewBox={ "0 0 " + pages(pageNumber).imageW.toString + " " + pages(pageNumber).imageH.toString }>
         <image xlink:href={ pages(pageNumber).uri }
           width={ pages(pageNumber).imageW.toString } height={ pages(pageNumber).imageH.toString }/>
-        { nodes(this.bboxNumber).toSVG }
+        { nodes(bboxNumber).toSVG }
       </svg>
     </div>
   }
 
   def perform(correction: String): Unit = {
-    updateAt(this.bboxNumber, correction)
+    updateAt(bboxNumber, correction)
   }
 
   def updateAt(i: Int, correction: String) = {
@@ -123,24 +122,14 @@ class ActiveOcrStep72 extends StatefulSnippet {
     nodesVar72(nodes.updated(i, updatedNode))
   }
 
-  def outputNodes(): Unit = {
-    val dirNumber = pageNumber + 1
-    val nodes = nodesVar72.is
-    var index = 0
-    for (node <- nodes) {
-      node match {
-        case l@TermLine(s, _, _, _, _) => {
-          index = index + 1
-          val outputFile = "./temp/" + f"$dirNumber%04d" + "/0100" + f"$index%02x" + ".gt.txt"
-          val outputPrinter = new java.io.PrintWriter(outputFile)
-          outputPrinter.println(s)
-          outputPrinter.close()
-        }
-        case _ => sys.error("Unexpected Bbox type.")
-      }
-    }
+  def outputNodes(): Unit = nodesVar72.is.zipWithIndex.foreach {
+    case (TermLine(s, _, _, _, _), index) =>
+      val dirNumber = pageNumber + 1
+      val outputFile = f"./temp/$dirNumber%04d/0100${index + 1}%02x.gt.txt"
+      val outputPrinter = new java.io.PrintWriter(outputFile)
+      outputPrinter.println(s)
+      outputPrinter.close()
+    case _ => sys.error("Unexpected Bbox type.")
   }
 }
 
-}
-}
