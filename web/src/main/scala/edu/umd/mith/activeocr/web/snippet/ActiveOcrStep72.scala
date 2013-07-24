@@ -67,15 +67,12 @@ class ActiveOcrStep72 extends StatefulSnippet {
   val nextBbox = queryString + (if (bboxNumber < lastBboxNumber) bboxNumber + 1 else lastBboxNumber).toString
   val lastBbox = queryString + lastBboxNumber.toString
   val img = ImageIO.read(new URL(pages(pageNumber).uri))
-  var ocrText = ""
-  nodes(bboxNumber) match {
-    case l@TermLine(s, x, y, w, h) =>
-      if ((w > 0) && (h > 0)) {
-        ocrText = l.s
-        val tmpImg = crop(img, x, y, w, h)
-        ImageIO.write(tmpImg, "png", new File("./src/main/webapp/images/tmp.png"))
-      }
-    case _ => ()
+  var ocrText = nodes(bboxNumber) match {
+    case TermLine(s, x, y, w, h) if ((w > 0) && (h > 0)) =>
+      val tmpImg = crop(img, x, y, w, h)
+      ImageIO.write(tmpImg, "png", new File("./src/main/webapp/images/tmp.png"))
+      s
+    case _ => sys.error("Unexpected Bbox type.")
   }
 
   def dispatch = {
@@ -139,7 +136,7 @@ class ActiveOcrStep72 extends StatefulSnippet {
           outputPrinter.println(s)
           outputPrinter.close()
         }
-        case _ => assert(false, "Unexpected Bbox type.")
+        case _ => sys.error("Unexpected Bbox type.")
       }
     }
   }
