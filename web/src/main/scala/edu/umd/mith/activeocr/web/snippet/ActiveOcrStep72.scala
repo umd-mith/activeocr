@@ -19,7 +19,7 @@
  */
 package edu.umd.mith.activeocr.web.snippet
 
-import edu.umd.mith.activeocr.util.model.{Bbox, OcroReader, TermLine}
+import edu.umd.mith.activeocr.util.model.{Bbox, LocalHostOcroReader, TermLine}
 import java.io.File
 import java.net.URL
 import javax.imageio.ImageIO
@@ -36,7 +36,7 @@ object pagesVar72 extends SessionVar[Int](0)
 class ActiveOcrStep72 extends StatefulSnippet {
   val source = Source.fromFile("../data/luxmundi07multipage.html")
   val reader = new XMLEventReader(source)
-  val pages = OcroReader.parsePage(reader)
+  val pages = LocalHostOcroReader.parsePage(reader)
   val lastPageNumber = pages.length -1
   val pageNumber = S.param("page").map(_.toInt).map {
     case tmp if tmp < 0 => 0

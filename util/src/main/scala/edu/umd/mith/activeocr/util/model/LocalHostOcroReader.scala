@@ -1,6 +1,6 @@
 /*
  * #%L
- * Active OCR Web Application
+ * Active OCR Utilities
  * %%
  * Copyright (C) 2011 - 2013 University of Maryland
  * %%
@@ -17,27 +17,18 @@
  * limitations under the License.
  * #L%
  */
-package edu.umd.mith.activeocr.web {
-package snippet {
+package edu.umd.mith.activeocr.util.model
 
-import edu.umd.mith.activeocr.util.model.LocalHostOcroReader
-import java.io.File
-import net.liftweb.util.Helpers._
-import scala.io.Source
-import scala.xml.NodeSeq
-import scala.xml.pull.XMLEventReader
+import java.net.URI
+import scala.util.matching.Regex
 
-class ActiveOcrStep71 {
-  val source = Source.fromFile("../data/luxmundi07multipage.html")
-  val reader = new XMLEventReader(source)
-  val pages = LocalHostOcroReader.parsePage(reader)
-
-  def transform(in: NodeSeq): NodeSeq = {
-    <div>
-      {for (page <- pages) yield <div>{page.toSVG}</div>}
-    </div>
+object LocalHostOcroReader extends OcroReader {
+  def parseTitle(title: String): (URI, String) = {
+    val pattern = new Regex("""file (temp\/\d{4}.bin.png)""", "filename")
+    val result = pattern.findFirstMatchIn(title).get
+    val filename = result.group("filename")
+    val facsimileUri = new URI("http://localhost:8080/static/images/" + filename)
+    val imageFileName = "../web/src/main/webapp/static/images/" + filename
+    (facsimileUri, imageFileName)
   }
-}
-
-}
 }

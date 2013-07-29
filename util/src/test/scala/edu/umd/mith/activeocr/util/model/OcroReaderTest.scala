@@ -49,7 +49,7 @@ trait OcroExample extends Scope {
   )
 
   val reader = new XMLEventReader(source)
-  val pages = OcroReader.parsePage(reader)
+  val pages = LocalHostOcroReader.parsePage(reader)
 
   source.close()
 }

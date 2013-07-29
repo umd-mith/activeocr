@@ -20,7 +20,7 @@
 package edu.umd.mith.activeocr.web {
 package snippet {
 
-import edu.umd.mith.activeocr.util.model.{Bbox, OcroReader, TermLine}
+import edu.umd.mith.activeocr.util.model.{Bbox, LocalHostOcroReader, TermLine}
 import java.io.File
 import javax.imageio.ImageIO
 import net.liftweb.http.{S, SessionVar, SHtml, StatefulSnippet}
@@ -35,7 +35,7 @@ object nodesVar70 extends SessionVar[IndexedSeq[Bbox]](IndexedSeq.empty[Bbox])
 class ActiveOcrStep70 extends StatefulSnippet {
   val source = Source.fromFile("../data/luxmundi07.html")
   val reader = new XMLEventReader(source)
-  val pages = OcroReader.parsePage(reader)
+  val pages = LocalHostOcroReader.parsePage(reader)
   if (nodesVar70.is.isEmpty) {
     nodesVar70(pages.head.bbList)
   }

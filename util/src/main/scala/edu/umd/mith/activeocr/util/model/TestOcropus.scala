@@ -30,7 +30,7 @@ object TestOcropus {
     )
     val reader = new XMLEventReader(source)
     val formatter = new scala.xml.PrettyPrinter(80, 2)
-    val pages = OcroReader.parsePage(reader)
+    val pages = LocalHostOcroReader.parsePage(reader)
     var index = 0
     var outFileName = "/dev/null"
     var printer = new java.io.PrintWriter(outFileName)
