@@ -28,7 +28,7 @@ import scala.xml.MetaData
 import scala.xml.pull.{EvComment, EvElemEnd, EvElemStart, EvText, XMLEventReader}
 
 object OcroReader extends HocrReader {
-  override def parsePage(reader: XMLEventReader): Seq[Page] = {
+  def parsePage(reader: XMLEventReader): Seq[Page] = {
     var pages = Seq[Page]()
     while (reader.hasNext) {
       reader.next match {

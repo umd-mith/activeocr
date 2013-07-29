@@ -24,29 +24,15 @@ import scala.util.control.Breaks.{break, breakable}
 import scala.xml.MetaData
 import scala.xml.pull.{EvElemEnd, EvElemStart, EvText, XMLEventReader}
 
-class HocrReader { 
-  // Intended to be overridden.
-  def parsePage(reader: XMLEventReader): Seq[Page] = {
-    var pages = Seq[Page]()
-    pages
-  }
+abstract class HocrReader { 
+  // Abstract method.
+  def parsePage(reader: XMLEventReader): Seq[Page]
 
   // Intended to be overridden.
   def makeNewPage(reader: XMLEventReader, attributes: MetaData,
       uri: URI, imageW: Int, imageH: Int): Page = {
     var page = new Page(IndexedSeq[Zone](), uri.toString, imageW, imageH)
     page
-  }
-
-  // Don't need this after all right now, but it's potentially useful (TB).
-  private def eatElement(reader: XMLEventReader) {
-    var depth = 1
-    while (reader.hasNext && depth > 0) {
-      reader.next match {
-        case _: EvElemStart => depth + 1
-        case _: EvElemEnd => depth - 1
-      }
-    }
   }
 
   def eatTitle(reader: XMLEventReader) = {
