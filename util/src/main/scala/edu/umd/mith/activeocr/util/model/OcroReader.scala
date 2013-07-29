@@ -19,12 +19,46 @@
  */
 package edu.umd.mith.activeocr.util.model
 
+import java.io.File
 import java.net.URI
-import scala.util.control.Breaks._
+import javax.imageio.ImageIO
+import scala.util.control.Breaks.{break, breakable}
+import scala.util.matching.Regex
 import scala.xml.MetaData
-import scala.xml.pull._
+import scala.xml.pull.{EvComment, EvElemEnd, EvElemStart, EvText, XMLEventReader}
 
 object OcroReader extends HocrReader {
+  override def parsePage(reader: XMLEventReader): Seq[Page] = {
+    var pages = Seq[Page]()
+    while (reader.hasNext) {
+      reader.next match {
+        case EvElemStart(_, "div", attrs, _) =>
+          val clss = attrs.asAttrMap.getOrElse("class", "")
+          val title = attrs.asAttrMap.getOrElse("title", "")
+          val pattern = new Regex("""file (temp\/\d{4}.bin.png)""", "filename")
+          val result = pattern.findFirstMatchIn(title).get
+          val filename = result.group("filename")
+          val facsimileUri = new URI("http://localhost:8080/static/images/" + filename)
+          val imageFileName = "../web/src/main/webapp/static/images/" + filename
+          val image = ImageIO.read(new File(imageFileName))
+          if (clss == "ocr_page") {
+            val page = makeNewPage(
+              reader, attrs, facsimileUri, image.getWidth, image.getHeight
+            )
+            pages = pages :+ page
+          }
+          else assert(false, "Unexpected <div>.")
+        case EvElemStart(_, "title", _, _) => eatTitle(reader)
+        case EvElemStart(_, "body"|"head"|"html"|"meta", _, _) => ()
+        case EvElemEnd(_, "body"|"head"|"html"|"meta") => ()
+        case EvText(text) => assume(text.trim.isEmpty)
+        case _: EvComment => ()
+        case _ => assert(false, "Unexpected XML event.")
+      }
+    }
+    pages
+  }
+
   override def makeNewPage(reader: XMLEventReader, attributes: MetaData,
       uri: URI, imageW: Int, imageH: Int): Page = {
     var page = new Page(IndexedSeq[Zone](), uri.toString, imageW, imageH)
