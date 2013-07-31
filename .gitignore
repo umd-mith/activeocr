@@ -1,7 +1,6 @@
 .lib/
 .project
 .settings
-data/temp/
 target/
 tmp/
 !web/src/main/webapp/images/tmp
