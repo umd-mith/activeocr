@@ -63,7 +63,7 @@ trait TessExample extends Scope {
   val reader = new XMLEventReader(source)
   val pages = TessReader.parsePage(
     reader,
-    this.getClass.getResource("/luxmundi.png").toURI
+    this.getClass.getResource("/luxmundi.jpeg").toURI
   )
 
   source.close()
