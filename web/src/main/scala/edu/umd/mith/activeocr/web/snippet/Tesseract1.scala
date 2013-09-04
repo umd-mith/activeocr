@@ -32,7 +32,7 @@ import javax.imageio.ImageIO
 import scala.io.Source
 import scala.xml.pull.XMLEventReader
 
-class ActiveOcrStep1 {
+class Tesseract1 {
   val hocrFileName = "../data/luxmundi302.html"
   val imageFileName = "../data/luxmundi.jpeg"
   val source = Source.fromFile(hocrFileName)

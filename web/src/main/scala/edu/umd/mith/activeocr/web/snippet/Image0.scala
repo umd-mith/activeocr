@@ -26,7 +26,7 @@ import _root_.net.liftweb.common._
 import edu.umd.mith.activeocr.web.lib._
 import Helpers._
 
-class ActiveOcrStep0 {
+class Image0 {
   def transform(in: NodeSeq): NodeSeq = {
     <img src={"/cached?url=http://localhost:8080/static/images/luxmundi.jpeg&rw=510"} id="target"/>
   }

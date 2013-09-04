@@ -32,7 +32,7 @@ import scala.xml.pull.XMLEventReader
 
 object nodesVar4 extends SessionVar[IndexedSeq[Bbox]](IndexedSeq.empty[Bbox])
 
-class ActiveOcrStep4 extends StatefulSnippet {
+class Tesseract2 extends StatefulSnippet {
   val hocrFileName = "../data/luxmundi302.html"
   val source = Source.fromFile(hocrFileName)
   val reader = new XMLEventReader(source)
@@ -41,9 +41,9 @@ class ActiveOcrStep4 extends StatefulSnippet {
   val img = ImageIO.read(new File(imageFileName))
   val count = (S.param("count") map { _.toInt } openOr(0))
   // enough information to declare and initialize first, prev
-  val firstString = "/activeocr4?count=0"
+  val firstString = "/tesseract2?count=0"
   val prevCount = if (count > 0) count - 1 else 0
-  val prevString = "activeocr4?count=" + prevCount.toString
+  val prevString = "tesseract2?count=" + prevCount.toString
   // not enough information to initialize last, next
   var lastString = ""
   var nextCount = 0
@@ -56,9 +56,9 @@ class ActiveOcrStep4 extends StatefulSnippet {
   for (page <- pages) {
     // enough information to initialize last, next
     val lastCount = nodes.length - 1
-    lastString = "activeocr4?count=" + lastCount.toString
+    lastString = "tesseract2?count=" + lastCount.toString
     nextCount = if (count < lastCount) count + 1 else lastCount
-    nextString = "activeocr4?count=" + nextCount.toString
+    nextString = "tesseract2?count=" + nextCount.toString
     val thisCount = if (count < 0) 0 else if (count > lastCount) lastCount else count
     nodes(thisCount) match {
       case t@TermWord(s, x, y, w, h) =>

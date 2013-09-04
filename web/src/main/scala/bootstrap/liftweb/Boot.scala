@@ -57,7 +57,7 @@ class Boot {
     // Build SiteMap
     def sitemap() = SiteMap(
       Menu("Home") / "index" >> User.AddUserMenusAfter, // Simple menu form
-      Menu("Jcrop Demo") / "jcrop" >> User.AddUserMenusAfter,     
+      Menu("Image Demo 0") / "image0" >> User.AddUserMenusAfter,     
       Menu("Tesseract Demo 1") / "tesseract1" >> User.AddUserMenusAfter,
       Menu("Tesseract Demo 2") / "tesseract2" >> User.AddUserMenusAfter,    
       // If you don’t add a page to your SiteMap
