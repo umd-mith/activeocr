@@ -57,9 +57,9 @@ class Boot {
     // Build SiteMap
     def sitemap() = SiteMap(
       Menu("Home") / "index" >> User.AddUserMenusAfter, // Simple menu form
-      Menu("Active OCR Step 0") / "activeocr0" >> User.AddUserMenusAfter,     
-      Menu("Active OCR Step 1") / "activeocr1" >> User.AddUserMenusAfter,
-      Menu("Active OCR Step 4") / "activeocr4" >> User.AddUserMenusAfter,    
+      Menu("Jcrop Demo") / "jcrop" >> User.AddUserMenusAfter,     
+      Menu("Tesseract Demo 1") / "tesseract1" >> User.AddUserMenusAfter,
+      Menu("Tesseract Demo 2") / "tesseract2" >> User.AddUserMenusAfter,    
       // If you don’t add a page to your SiteMap
       // it will not be displayed by Lift on your web site.
       // Menu items marked Hidden will not be displayed in the menu hierarchy,
