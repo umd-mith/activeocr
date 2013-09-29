@@ -32,7 +32,7 @@ import javax.imageio.ImageIO
 import scala.io.Source
 import scala.xml.pull.XMLEventReader
 
-class Tesseract1 {
+class TesseractViewer {
   val hocrFileName = "../data/luxmundi302.html"
   val imageFileName = "../data/luxmundi.jpeg"
   val source = Source.fromFile(hocrFileName)

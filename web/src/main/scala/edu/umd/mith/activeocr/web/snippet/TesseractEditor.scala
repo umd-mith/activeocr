@@ -30,9 +30,9 @@ import scala.io.Source
 import scala.xml.NodeSeq
 import scala.xml.pull.XMLEventReader
 
-object nodesVar4 extends SessionVar[IndexedSeq[Bbox]](IndexedSeq.empty[Bbox])
+object nodeVarTessEdit extends SessionVar[IndexedSeq[Bbox]](IndexedSeq.empty[Bbox])
 
-class Tesseract2 extends StatefulSnippet {
+class TesseractEditor extends StatefulSnippet {
   val hocrFileName = "../data/luxmundi302.html"
   val source = Source.fromFile(hocrFileName)
   val reader = new XMLEventReader(source)
@@ -41,24 +41,24 @@ class Tesseract2 extends StatefulSnippet {
   val img = ImageIO.read(new File(imageFileName))
   val count = (S.param("count") map { _.toInt } openOr(0))
   // enough information to declare and initialize first, prev
-  val firstString = "/tesseract2?count=0"
+  val firstString = "/tessedit?count=0"
   val prevCount = if (count > 0) count - 1 else 0
-  val prevString = "tesseract2?count=" + prevCount.toString
+  val prevString = "tessedit?count=" + prevCount.toString
   // not enough information to initialize last, next
   var lastString = ""
   var nextCount = 0
   var nextString = ""
   var ocrText = ""
-  if (nodesVar4.is.isEmpty) {
-    nodesVar4(pages.head.bbList)
+  if (nodeVarTessEdit.is.isEmpty) {
+    nodeVarTessEdit(pages.head.bbList)
   }
-  val nodes = nodesVar4.is
+  val nodes = nodeVarTessEdit.is
   for (page <- pages) {
     // enough information to initialize last, next
     val lastCount = nodes.length - 1
-    lastString = "tesseract2?count=" + lastCount.toString
+    lastString = "tessedit?count=" + lastCount.toString
     nextCount = if (count < lastCount) count + 1 else lastCount
-    nextString = "tesseract2?count=" + nextCount.toString
+    nextString = "tessedit?count=" + nextCount.toString
     val thisCount = if (count < 0) 0 else if (count > lastCount) lastCount else count
     nodes(thisCount) match {
       case t@TermWord(s, x, y, w, h) =>
@@ -83,12 +83,12 @@ class Tesseract2 extends StatefulSnippet {
   }
 
   def updateAt(i: Int, correction: String) = {
-    val nodes = nodesVar4.is
+    val nodes = nodeVarTessEdit.is
     val updatedNode = nodes(i) match {
       case t: TermWord => t.copy(s = correction)
       case g: Glyph => g.copy(c = correction)
     }
-    nodesVar4(nodes.updated(i, updatedNode))
+    nodeVarTessEdit(nodes.updated(i, updatedNode))
   }
 
   def renderRight(in: NodeSeq): NodeSeq = {
