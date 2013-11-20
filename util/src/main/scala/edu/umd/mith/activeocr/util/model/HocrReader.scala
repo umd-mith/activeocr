@@ -26,7 +26,7 @@ import scala.xml.pull.{EvElemEnd, EvElemStart, EvText, XMLEventReader}
 
 trait HocrReader { 
   // Abstract method.
-  def parsePage(reader: XMLEventReader): Seq[Page]
+  // def parsePage(reader: XMLEventReader): Seq[Page]
 
   // Intended to be overridden.
   def makeNewPage(reader: XMLEventReader, attributes: MetaData,
