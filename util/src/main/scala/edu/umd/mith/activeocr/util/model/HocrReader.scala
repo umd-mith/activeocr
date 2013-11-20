@@ -21,37 +21,11 @@ package edu.umd.mith.activeocr.util.model
 
 import java.net.URI
 import javax.media.jai._
-import javax.imageio.ImageIO
 import scala.util.control.Breaks._
 import scala.xml.MetaData
 import scala.xml.pull._
 
 class HocrReader { 
-  def parsePage(reader: XMLEventReader, facsimileUri: URI): Seq[Page] = {
-    var pages = Seq[Page]()
-    val image = ImageIO.read(facsimileUri.toURL)
-    while (reader.hasNext) {
-      reader.next match {
-        case EvElemStart(_, "div", attrs, _) =>
-          val clss = attrs.asAttrMap.getOrElse("class", "")
-          if (clss == "ocr_page") {
-            val page = makeNewPage(
-              reader, attrs, facsimileUri, image.getWidth, image.getHeight
-            )
-            pages = pages :+ page
-          }
-          else assert(false, "Unexpected <div>.")
-        case EvElemStart(_, "title", _, _) => eatTitle(reader)
-        case EvElemStart(_, "body"|"head"|"html"|"meta", _, _) => ()
-        case EvElemEnd(_, "body"|"head"|"html"|"meta") => ()
-        case EvText(text) => assume(text.trim.isEmpty)
-        case _: EvComment => ()
-        case _ => assert(false, "Unexpected XML event.")
-      }
-    }
-    pages
-  }
-
   // Intended to be overridden.
   def makeNewPage(reader: XMLEventReader, attributes: MetaData,
       uri: URI, imageW: Int, imageH: Int): Page = {
