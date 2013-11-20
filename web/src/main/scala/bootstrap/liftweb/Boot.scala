@@ -57,11 +57,11 @@ class Boot {
     // Build SiteMap
     def sitemap() = SiteMap(
       Menu("Home") / "index" >> User.AddUserMenusAfter, // Simple menu form
-      Menu("Active OCR Step 7.0") / "activeocr70" >> User.AddUserMenusAfter,
-      Menu("Active OCR Step 7.1") / "activeocr71" >> User.AddUserMenusAfter,
-      Menu("Active OCR Step 7.2") / "activeocr72" >> User.AddUserMenusAfter,
       Menu("Image Viewer") / "imageview" >> User.AddUserMenusAfter,
+      Menu("OCRopus Viewer") / "ocroview" >> User.AddUserMenusAfter,
       Menu("Tesseract Viewer") / "tessview" >> User.AddUserMenusAfter,
+      Menu("Active OCR Step 7.0") / "activeocr70" >> User.AddUserMenusAfter,
+      Menu("Active OCR Step 7.2") / "activeocr72" >> User.AddUserMenusAfter,
       Menu("Tesseract Editor") / "tessedit" >> User.AddUserMenusAfter,
       // If you don’t add a page to your SiteMap
       // it will not be displayed by Lift on your web site.

@@ -27,7 +27,7 @@ import scala.io.Source
 import scala.xml.NodeSeq
 import scala.xml.pull.XMLEventReader
 
-class ActiveOcrStep71 {
+class OCRopusViewer {
   val source = Source.fromFile("../data/luxmundi07multipage.html")
   val reader = new XMLEventReader(source)
   val pages = LocalHostOcroReader.parsePage(reader)
