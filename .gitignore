@@ -1,4 +1,3 @@
-.lib/
 .project
 .settings
 target/
@@ -13,6 +12,7 @@ web/.classpath
 web/.project
 web/.settings
 web/target/
+web/temp/
 tmp.jpeg
 tmp.png
 *.db
