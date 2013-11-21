@@ -34,7 +34,7 @@ trait Bbox {
       color.map("stroke: %s; ".format(_)).getOrElse("")
     )} x={this.x.toString} y={this.y.toString}
     width={this.w.toString} height={this.h.toString}/>
-  
+
   def bbList: IndexedSeq[Bbox] = IndexedSeq(this)
 }
 
@@ -53,7 +53,7 @@ trait Container[A <: Bbox, B <: Container[A, B]] extends Bbox {
   def replaceLast(f: A => A): B
 
   override def toSVG = super.toSVG ++ this.children.flatMap(_.toSVG)
-  
+
   override def bbList: IndexedSeq[Bbox] = this.children.flatMap(_.bbList)
 }
 
@@ -67,21 +67,21 @@ case class Glyph(var c: String, x: Int, y: Int, w: Int, h: Int) extends Bbox {
 
 case class TermWord(var s: String, x: Int, y: Int, w: Int, h: Int) extends Word
 
-case class ContWord(children: IndexedSeq[Glyph]) 
+case class ContWord(children: IndexedSeq[Glyph])
     extends Container[Glyph, ContWord] with Word {
   def addChild(child: Glyph) = this.copy(children = this.children :+ child)
 
-  def replaceLast(f: Glyph => Glyph) = 
+  def replaceLast(f: Glyph => Glyph) =
     this.copy(children = this.children.init :+ f(this.children.last))
 }
 
 case class TermLine(s: String, x: Int, y: Int, w: Int, h: Int) extends Line
 
-case class ContLine(children: IndexedSeq[Word]) 
+case class ContLine(children: IndexedSeq[Word])
     extends Container[Word, ContLine] with Line {
   def addChild(child: Word) = this.copy(children = this.children :+ child)
 
-  def replaceLast(f: Word => Word) = 
+  def replaceLast(f: Word => Word) =
     this.copy(children = this.children.init :+ f(this.children.last))
 }
 
@@ -89,14 +89,14 @@ case class Zone(children: IndexedSeq[Line]) extends Container[Line, Zone] {
   override val color = Some("red")
   def addChild(child: Line) = this.copy(children = this.children :+ child)
 
-  def replaceLast(f: Line => Line) = 
+  def replaceLast(f: Line => Line) =
     this.copy(children = this.children.init :+ f(this.children.last))
 }
 
 case class Page(children: IndexedSeq[Zone], uri: String, imageW: Int, imageH: Int) extends Container[Zone, Page] {
   def addChild(child: Zone) = this.copy(children = this.children :+ child)
 
-  def replaceLast(f: Zone => Zone) = 
+  def replaceLast(f: Zone => Zone) =
     this.copy(children = this.children.init :+ f(this.children.last))
 
   override def toSVG = toSVG(uri)

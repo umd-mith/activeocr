@@ -24,7 +24,7 @@ import scala.util.control.Breaks.{break, breakable}
 import scala.xml.MetaData
 import scala.xml.pull.{EvElemEnd, EvElemStart, EvText, XMLEventReader}
 
-trait HocrReader { 
+trait HocrReader {
   // Abstract method.
   // def parsePage(reader: XMLEventReader): Seq[Page]
 

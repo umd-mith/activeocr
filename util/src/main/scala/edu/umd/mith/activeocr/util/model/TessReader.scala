@@ -138,7 +138,7 @@ object TessReader extends HocrReader {
     val bboxAndCuts = title
     val matchString = """(bbox \d+ \d+ \d+ \d+); cuts$"""
     val Re = matchString.r
-    val word = 
+    val word =
       if (bboxAndCuts.matches(matchString)) {
         val Re(bboxOnly) = title
         HocrBboxParser(bboxOnly).get.toWord(tmpWord)

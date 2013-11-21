@@ -32,3 +32,4 @@ object LocalFileOcroReader extends OcroReader {
     (facsimileUri, imageFileName)
   }
 }
+

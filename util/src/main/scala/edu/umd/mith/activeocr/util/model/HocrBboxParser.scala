@@ -38,7 +38,7 @@ case class HocrBbox(
         }.sum).toInt
         case _ => throw new RuntimeException("Will never happen.")
       }
-      
+
       averaged.zip(averaged.tail :+ this.w).zip(cs).map {
         case ((x1, x2), c) => Glyph(c, x1 + this.x, y, x2 - x1, h)
       }
