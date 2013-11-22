@@ -30,7 +30,7 @@ import scala.io.Source
 import scala.xml.NodeSeq
 import scala.xml.pull.XMLEventReader
 
-object nodeVarTessEdit extends SessionVar[IndexedSeq[Bbox]](IndexedSeq.empty[Bbox])
+object nodesVarTessEdit extends SessionVar[IndexedSeq[Bbox]](IndexedSeq.empty[Bbox])
 
 class TesseractEditor extends StatefulSnippet {
   val hocrFileName = "../data/luxmundi302.html"
@@ -49,10 +49,10 @@ class TesseractEditor extends StatefulSnippet {
   var nextCount = 0
   var nextString = ""
   var ocrText = ""
-  if (nodeVarTessEdit.is.isEmpty) {
-    nodeVarTessEdit(pages.head.bbList)
+  if (nodesVarTessEdit.is.isEmpty) {
+    nodesVarTessEdit(pages.head.bbList)
   }
-  val nodes = nodeVarTessEdit.is
+  val nodes = nodesVarTessEdit.is
   for (page <- pages) {
     // enough information to initialize last, next
     val lastCount = nodes.length - 1
@@ -83,12 +83,12 @@ class TesseractEditor extends StatefulSnippet {
   }
 
   def updateAt(i: Int, correction: String) = {
-    val nodes = nodeVarTessEdit.is
+    val nodes = nodesVarTessEdit.is
     val updatedNode = nodes(i) match {
       case t: TermWord => t.copy(s = correction)
       case g: Glyph => g.copy(c = correction)
     }
-    nodeVarTessEdit(nodes.updated(i, updatedNode))
+    nodesVarTessEdit(nodes.updated(i, updatedNode))
   }
 
   def renderRight(in: NodeSeq): NodeSeq = {

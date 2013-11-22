@@ -27,7 +27,7 @@ import scala.xml.NodeSeq
 class Users {
   val items = model.User.findAll()
   def render(in: NodeSeq): NodeSeq = {
-    val tableRows = items.map(item => 
+    val tableRows = items.map(item =>
       <tr>
         <td>{item.uniqueName}</td>
         <td>{item.nickname}</td>

@@ -30,10 +30,10 @@ import scala.io.Source
 import scala.xml.NodeSeq
 import scala.xml.pull.XMLEventReader
 
-object nodesVar72 extends SessionVar[IndexedSeq[Bbox]](IndexedSeq.empty[Bbox])
-object pagesVar72 extends SessionVar[Int](0)
+object nodesVarOcroEdit extends SessionVar[IndexedSeq[Bbox]](IndexedSeq.empty[Bbox])
+object pageVarOcroEdit extends SessionVar[Int](0)
 
-class ActiveOcrStep72 extends StatefulSnippet {
+class OCRopusEditor extends StatefulSnippet {
   val source = Source.fromFile("../data/luxmundi07multipage.html")
   val reader = new XMLEventReader(source)
   val pages = LocalHostOcroReader.parsePage(reader)
@@ -43,17 +43,17 @@ class ActiveOcrStep72 extends StatefulSnippet {
     case tmp if tmp > lastPageNumber => lastPageNumber
     case tmp => tmp
   }.openOr(0)
-  val pageString = "/activeocr72?page="
+  val pageString = "/ocroedit?page="
   val firstPage = pageString + 0.toString
   val prevPage = pageString + (if (pageNumber > 0) pageNumber - 1 else 0).toString
   val nextPage = pageString + (if (pageNumber < lastPageNumber) pageNumber + 1 else lastPageNumber).toString
   val lastPage = pageString + lastPageNumber.toString
-  val oldPageNumber = pagesVar72.is
-  if (nodesVar72.is.isEmpty || pageNumber != oldPageNumber) {
-    nodesVar72(pages(pageNumber).bbList)
+  val oldPageNumber = pageVarOcroEdit.is
+  if (nodesVarOcroEdit.is.isEmpty || pageNumber != oldPageNumber) {
+    nodesVarOcroEdit(pages(pageNumber).bbList)
   }
-  pagesVar72(pageNumber)
-  val nodes = nodesVar72.is
+  pageVarOcroEdit(pageNumber)
+  val nodes = nodesVarOcroEdit.is
   val lastBboxNumber = nodes.length - 1
   val bboxNumber = S.param("bbox").map(_.toInt).map {
     case tmp if tmp < 0 => 0
@@ -115,14 +115,14 @@ class ActiveOcrStep72 extends StatefulSnippet {
   }
 
   def updateAt(i: Int, correction: String) = {
-    val nodes = nodesVar72.is
+    val nodes = nodesVarOcroEdit.is
     val updatedNode = nodes(i) match {
       case l: TermLine => l.copy(s = correction)
     }
-    nodesVar72(nodes.updated(i, updatedNode))
+    nodesVarOcroEdit(nodes.updated(i, updatedNode))
   }
 
-  def outputNodes(): Unit = nodesVar72.is.zipWithIndex.foreach {
+  def outputNodes(): Unit = nodesVarOcroEdit.is.zipWithIndex.foreach {
     case (TermLine(s, _, _, _, _), index) =>
       val dirNumber = pageNumber + 1
       val outputFile = f"./temp/$dirNumber%04d/0100${index + 1}%02x.gt.txt"

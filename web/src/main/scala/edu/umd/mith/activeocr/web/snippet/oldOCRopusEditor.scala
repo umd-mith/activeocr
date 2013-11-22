@@ -30,20 +30,20 @@ import scala.io.Source
 import scala.xml.NodeSeq
 import scala.xml.pull.XMLEventReader
 
-object nodesVar70 extends SessionVar[IndexedSeq[Bbox]](IndexedSeq.empty[Bbox])
+object oldNodesVarOcroEdit extends SessionVar[IndexedSeq[Bbox]](IndexedSeq.empty[Bbox])
 
-class ActiveOcrStep70 extends StatefulSnippet {
+class oldOCRopusEditor extends StatefulSnippet {
   val source = Source.fromFile("../data/luxmundi07.html")
   val reader = new XMLEventReader(source)
   val pages = LocalHostOcroReader.parsePage(reader)
-  if (nodesVar70.is.isEmpty) {
-    nodesVar70(pages.head.bbList)
+  if (oldNodesVarOcroEdit.is.isEmpty) {
+    oldNodesVarOcroEdit(pages.head.bbList)
   }
-  val nodes = nodesVar70.is
+  val nodes = oldNodesVarOcroEdit.is
   val lastBboxNumber = nodes.length - 1
   val tmpBboxNumber = (S.param("bbox") map { _.toInt } openOr(0))
   val bboxNumber = if (tmpBboxNumber < 0) 0 else if (tmpBboxNumber > lastBboxNumber) lastBboxNumber else tmpBboxNumber
-  val queryString = "/activeocr70?bbox="
+  val queryString = "/oldocroedit?bbox="
   val firstBbox = queryString + 0.toString
   val prevBbox = queryString + (if (bboxNumber > 0) bboxNumber - 1 else 0).toString
   val nextBbox = queryString + (if (bboxNumber < lastBboxNumber) bboxNumber + 1 else lastBboxNumber).toString
@@ -99,15 +99,15 @@ class ActiveOcrStep70 extends StatefulSnippet {
   }
 
   def updateAt(i: Int, correction: String) = {
-    val nodes = nodesVar70.is
+    val nodes = oldNodesVarOcroEdit.is
     val updatedNode = nodes(i) match {
       case l: TermLine => l.copy(s = correction)
     }
-    nodesVar70(nodes.updated(i, updatedNode))
+    oldNodesVarOcroEdit(nodes.updated(i, updatedNode))
   }
 
   def outputNodes(): Unit = {
-    val nodes = nodesVar70.is
+    val nodes = oldNodesVarOcroEdit.is
     var index = 1
     var outputFile = "/dev/null"
     var outputPrinter = new java.io.PrintWriter(outputFile)

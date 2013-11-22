@@ -39,9 +39,9 @@ import edu.umd.mith.util.lift.image._
 class Boot {
   def boot {
     if (!DB.jndiJdbcConnAvailable_?) {
-      val vendor = 
+      val vendor =
 	new StandardDBVendor(Props.get("db.driver") openOr "org.h2.Driver",
-			     Props.get("db.url") openOr 
+			     Props.get("db.url") openOr
 			     "jdbc:h2:lift_proto.db;AUTO_SERVER=TRUE",
 			     Props.get("db.user"), Props.get("db.password"))
 
@@ -60,17 +60,17 @@ class Boot {
       Menu("Image Viewer") / "imageview" >> User.AddUserMenusAfter,
       Menu("OCRopus Viewer") / "ocroview" >> User.AddUserMenusAfter,
       Menu("Tesseract Viewer") / "tessview" >> User.AddUserMenusAfter,
-      Menu("Active OCR Step 7.0") / "activeocr70" >> User.AddUserMenusAfter,
-      Menu("Active OCR Step 7.2") / "activeocr72" >> User.AddUserMenusAfter,
+      Menu("OCRopusEditor") / "oldocroedit" >> Hidden,
+      Menu("OCRopusEditor") / "ocroedit" >> User.AddUserMenusAfter,
       Menu("Tesseract Editor") / "tessedit" >> User.AddUserMenusAfter,
       // If you don’t add a page to your SiteMap
       // it will not be displayed by Lift on your web site.
       // Menu items marked Hidden will not be displayed in the menu hierarchy,
-      // but the page can be accessed. 
-      Menu("User") / "user" >> Hidden,    
-      Menu("Users") / "users" >> Hidden,    
+      // but the page can be accessed.
+      Menu("User") / "user" >> Hidden,
+      Menu("Users") / "users" >> Hidden,
       // Menu with special Link
-      Menu(Loc("Static", Link(List("static"), true, "/static/index"), 
+      Menu(Loc("Static", Link(List("static"), true, "/static/index"),
 	       "Static Content")))
 
     LiftRules.setSiteMapFunc(() => User.sitemapMutator(sitemap()))
