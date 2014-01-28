@@ -60,7 +60,6 @@ class Boot {
       Menu("Image Viewer") / "imageview" >> User.AddUserMenusAfter,
       Menu("OCRopus Viewer") / "ocroview" >> User.AddUserMenusAfter,
       Menu("Tesseract Viewer") / "tessview" >> User.AddUserMenusAfter,
-      Menu("OCRopusEditor") / "oldocroedit" >> Hidden,
       Menu("OCRopusEditor") / "ocroedit" >> User.AddUserMenusAfter,
       Menu("Tesseract Editor") / "tessedit" >> User.AddUserMenusAfter,
       // If you don’t add a page to your SiteMap

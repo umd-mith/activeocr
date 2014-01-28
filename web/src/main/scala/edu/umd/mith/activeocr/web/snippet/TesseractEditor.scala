@@ -93,10 +93,10 @@ class TesseractEditor extends StatefulSnippet {
 
   def renderRight(in: NodeSeq): NodeSeq = {
     bind ("prefix", in,
-      "firstString" -> <a href={firstString}>&lt;&lt; First</a>,
-      "prevString" -> <a href={prevString}>&lt; Previous</a>,
-      "nextString" -> <a href={nextString}>Next &gt;</a>,
-      "lastString" -> <a href={lastString}>Last &gt;&gt;</a>,
+      "firstString" -> <a href={firstString}>&lt;&lt; First Bbox</a>,
+      "prevString" -> <a href={prevString}>&lt; Previous Bbox</a>,
+      "nextString" -> <a href={nextString}>Next Bbox &gt;</a>,
+      "lastString" -> <a href={lastString}>Last Bbox &gt;&gt;</a>,
       "ocrText" -> ocrText,
       "correction" -> SHtml.text(ocrText, { s: String => ocrText = s }, "size" -> "3"),
       "perform" -> SHtml.submit("Submit", () => perform(ocrText))
